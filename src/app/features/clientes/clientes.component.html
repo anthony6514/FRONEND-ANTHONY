@@ -1,0 +1,162 @@
+<div class="clientes animate-fade">
+  <div class="page-header">
+    <div>
+      <h1>Clientes</h1>
+      <p class="breadcrumb">Inicio / Clientes</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--outline" ><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--primary" (click)="openNew()">
+        <span class="material-icons-round">person_add</span> Nuevo cliente
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">people</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Total clientes</span>
+        <span class="stat-value">{{ totalClientes }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">person_check</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Clientes activos</span>
+        <span class="stat-value">{{ clientesActivos }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">account_balance_wallet</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Con saldo pendiente</span>
+        <span class="stat-value">{{ conSaldo }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--danger"><span class="material-icons-round">payments</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Saldo pendiente total</span>
+        <span class="stat-value">S/ {{ totalSaldo | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout-split">
+    <div class="card table-card" [class.has-panel]="showForm()">
+      <div class="toolbar">
+        <div class="search-bar" style="flex:1;max-width:340px">
+          <span class="material-icons-round">search</span>
+          <input placeholder="Buscar por RUC / nombre / ciudad..."
+                 [value]="search()" (input)="search.set($any($event.target).value)" />
+        </div>
+        <select class="filter-select"><option>Todos</option><option>Activos</option><option>Inactivos</option></select>
+        <select class="filter-select"><option>Todos</option><option>Barón</option><option>Jaime</option></select>
+        <select class="filter-select"><option>Todas</option><option>Lima</option><option>Trujillo</option></select>
+        <button class="btn btn--ghost"><span class="material-icons-round">filter_list</span></button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>N° Cliente</th>
+              <th>RUC / Documento</th>
+              <th>Razón social / Cliente</th>
+              <th>Teléfono</th>
+              <th>Ciudad</th>
+              <th>Vendedor</th>
+              <th>Total compras</th>
+              <th>Saldo pendiente</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of filtered()">
+              <td class="mono">CL-{{ c.id | number:'6.0-0' }}</td>
+              <td class="mono">{{ c.ruc }}</td>
+              <td>
+                <div class="cliente-name-cell">
+                  <div class="cli-avatar">{{ c.nombre.charAt(0) }}</div>
+                  <span>{{ c.nombre }}</span>
+                </div>
+              </td>
+              <td>{{ c.telefono }}</td>
+              <td>{{ c.ciudad }}</td>
+              <td>{{ c.vendedor }}</td>
+              <td class="fw-600">S/ {{ c.totalCompras | number:'1.2-2' }}</td>
+              <td>
+                <span [class]="c.saldoPendiente > 0 ? 'saldo-pendiente' : 'saldo-ok'">
+                  S/ {{ c.saldoPendiente | number:'1.2-2' }}
+                </span>
+              </td>
+              <td><span class="badge" [ngClass]="c.estado === 'ACTIVO' ? 'badge--success' : 'badge--neutral'">{{ c.estado }}</span></td>
+              <td>
+                <div class="actions">
+                  <button class="icon-btn" title="Ver"><span class="material-icons-round">visibility</span></button>
+                  <button class="icon-btn" title="Editar" (click)="openEdit(c)"><span class="material-icons-round">edit</span></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span class="pg-info">Total registros: {{ filtered().length }}</span>
+        <div class="pg-buttons">
+          <button class="pg-btn">Anterior</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">Siguiente</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-form card animate-slide" *ngIf="showForm()">
+      <div class="form-panel-header">
+        <h3>{{ editCliente() ? 'Editar cliente' : 'Nuevo cliente' }}</h3>
+        <button class="icon-btn" (click)="close()"><span class="material-icons-round">close</span></button>
+      </div>
+
+      <form (ngSubmit)="save()" #cf="ngForm" class="form-body">
+        <div class="fg">
+          <label>Tipo de documento</label>
+          <select><option>RUC</option><option>DNI</option></select>
+        </div>
+        <div class="fg">
+          <label>N° Documento</label>
+          <input [(ngModel)]="form.ruc" name="ruc" placeholder="20xxxxxxxxx" required />
+        </div>
+        <div class="fg">
+          <label>Razón social / Nombre</label>
+          <input [(ngModel)]="form.nombre" name="nombre" placeholder="Empresa S.A.C." required />
+        </div>
+        <div class="fg">
+          <label>Teléfono</label>
+          <input [(ngModel)]="form.telefono" name="telefono" placeholder="+51 999 000 111" />
+        </div>
+        <div class="fg">
+          <label>Ciudad</label>
+          <input [(ngModel)]="form.ciudad" name="ciudad" placeholder="Lima" />
+        </div>
+        <div class="fg">
+          <label>Vendedor asignado</label>
+          <select [(ngModel)]="form.vendedor" name="vendedor">
+            <option value="">— Seleccionar —</option>
+            <option>Barón</option>
+            <option>Jaime</option>
+          </select>
+        </div>
+        <div class="form-footer">
+          <button type="button" class="btn btn--outline" (click)="close()">Cancelar</button>
+          <button type="submit" class="btn btn--primary">
+            <span class="material-icons-round">save</span> Guardar cliente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

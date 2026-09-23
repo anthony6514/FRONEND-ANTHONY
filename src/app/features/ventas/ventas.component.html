@@ -1,0 +1,105 @@
+<div class="ventas animate-fade">
+  <div class="page-header">
+    <div><h1>Salidas de Mercadería</h1><p class="breadcrumb">Inventario / Salidas de Mercadería</p></div>
+    <div class="header-actions">
+      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--outline"><span class="material-icons-round">inventory</span> Kárdex</button>
+      <button class="btn btn--primary">
+        <span class="material-icons-round">add</span> Nueva Venta
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">point_of_sale</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Salidas del mes</span>
+        <span class="stat-value">{{ totalVentas }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">water_drop</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Litros despachados</span>
+        <span class="stat-value">18.640 L</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">payments</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Valor despachado</span>
+        <span class="stat-value">S/ {{ montoTotal | number:'1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">pending_actions</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Pendiente de despacho</span>
+        <span class="stat-value">7</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="toolbar">
+      <div class="search-bar" style="flex:1;max-width:280px">
+        <span class="material-icons-round">search</span>
+        <input placeholder="Buscar cliente..." [value]="search()" (input)="search.set($any($event.target).value)" />
+      </div>
+      <select class="filter-select"><option>N° Proforma: Todos</option></select>
+      <input type="date" class="filter-input" value="2026-05-01" />
+      <input type="date" class="filter-input" value="2026-09-17" />
+      <select class="filter-select"><option>Estado: Todos</option><option>PENDIENTE</option><option>PAGADA</option><option>PARCIAL</option><option>ANULADA</option></select>
+      <button class="btn btn--primary btn--sm">Buscar</button>
+      <button class="btn btn--ghost btn--sm">Limpiar</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° Salida</th>
+            <th>Fecha</th>
+            <th>N° Proforma</th>
+            <th>Cliente</th>
+            <th>Vendedor</th>
+            <th>Productos</th>
+            <th>Litros</th>
+            <th>Valor (S/)</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of filtered()">
+            <td class="mono">{{ v.numero }}</td>
+            <td>{{ v.fecha }}</td>
+            <td class="mono">{{ v.proformaNro ?? '—' }}</td>
+            <td>{{ v.clienteNombre }}</td>
+            <td>{{ v.vendedor }}</td>
+            <td>{{ v.detalles.length || '3' }} productos</td>
+            <td>{{ (1000 + v.id * 200) | number:'1.0-0' }} L</td>
+            <td class="fw-600">S/ {{ v.totalVenta | number:'1.2-2' }}</td>
+            <td><span class="badge" [ngClass]="estadoBadge(v.estado)">{{ v.estado }}</span></td>
+            <td>
+              <div class="actions">
+                <button class="icon-btn" title="Ver"><span class="material-icons-round">visibility</span></button>
+                <button class="icon-btn" title="Recibo"><span class="material-icons-round">receipt</span></button>
+                <button class="icon-btn" title="PDF"><span class="material-icons-round">picture_as_pdf</span></button>
+                <button class="icon-btn icon-btn--danger" title="Anular"><span class="material-icons-round">delete</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Total registros: {{ filtered().length }}</span>
+      <div class="pagination-simple">
+        <button>Anterior</button><button class="active">1</button><button>Siguiente</button>
+      </div>
+    </div>
+  </div>
+</div>

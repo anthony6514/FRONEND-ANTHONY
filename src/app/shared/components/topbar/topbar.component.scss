@@ -1,0 +1,157 @@
+.topbar {
+  height: var(--topbar-height);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition);
+}
+
+.topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.repsol-badge {
+  display: flex;
+  align-items: center;
+}
+
+.repsol-logo {
+  height: 44px;
+  object-fit: contain;
+  opacity: 1;
+  transition: opacity var(--transition);
+  &:hover { opacity: .85; }
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+
+  .material-icons-round { font-size: 1.15rem; }
+
+  &:hover {
+    background: var(--brand-orange-soft);
+    color: var(--brand-orange);
+    transform: scale(1.1);
+  }
+}
+
+.notif-btn { position: relative; }
+
+.notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  border: 2px solid var(--surface);
+  animation: pulse-ring 2s infinite;
+}
+
+// ─── User chip ────────────────────────────────────────────────────────────────
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 6px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+  margin-left: 4px;
+
+  &:hover { background: var(--brand-orange-soft); }
+}
+
+.chip-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chip-name {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.chip-role {
+  display: block;
+  font-size: .68rem;
+  color: var(--text-secondary);
+}
+
+.chip-arrow {
+  font-size: 1rem !important;
+  color: var(--text-secondary);
+}
+
+// ─── Dropdown ─────────────────────────────────────────────────────────────────
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  overflow: hidden;
+  animation: fadeIn .2s ease;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: .85rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background var(--transition);
+
+  .material-icons-round { font-size: 1rem; color: var(--text-secondary); }
+
+  &:hover { background: var(--brand-orange-soft); }
+  &.danger { color: var(--danger); .material-icons-round { color: var(--danger); } }
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+}

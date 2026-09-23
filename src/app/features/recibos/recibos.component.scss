@@ -1,0 +1,22 @@
+.recibos { max-width: 1400px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.filter-input, .filter-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-primary); font-size: .8rem; &:focus { outline: none; border-color: var(--brand-orange); } }
+.btn--sm { padding: 7px 12px; font-size: .8rem; }
+.table-wrap { overflow-x: auto; }
+.fw-600 { font-weight: 600; }
+.mono   { font-family: monospace; font-size: .82rem; }
+.metodo-cell { display: flex; align-items: center; gap: 5px; font-size: .82rem; .material-icons-round { font-size: .95rem; color: var(--brand-orange); } }
+.saldo-pendiente { color: var(--warning); font-weight: 600; }
+.saldo-ok        { color: var(--success); font-weight: 600; }
+.actions { display: flex; gap: 3px; }
+.icon-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 5px; color: var(--text-secondary); transition: all var(--transition); .material-icons-round { font-size: .95rem; } &:hover { background: var(--brand-orange-soft); color: var(--brand-orange); } &--danger:hover { background: var(--danger-soft); color: var(--danger); } }
+.table-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); font-size: .82rem; color: var(--text-secondary); }
+.pagination-simple { display: flex; gap: 4px; button { padding: 4px 9px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; font-size: .78rem; &:hover, &.active { background: var(--brand-orange); color: #fff; border-color: var(--brand-orange); } } }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(3px); }
+.modal-card { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 600px; box-shadow: var(--shadow-lg); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); h3 { font-size: 1.05rem; font-weight: 600; } }
+.modal-body { padding: 20px 24px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border); }
+.recibo-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { label { display: block; font-size: .75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; } input, select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--background); color: var(--text-primary); font-size: .85rem; font-family: inherit; &:focus { outline: none; border-color: var(--brand-orange); } } }

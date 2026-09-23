@@ -1,0 +1,107 @@
+<div class="reportes animate-fade">
+  <div class="page-header">
+    <div><h1>Reportes y Estadísticas</h1><p class="breadcrumb">Inicio / Reportes</p></div>
+    <div class="header-actions">
+      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--outline"><span class="material-icons-round">picture_as_pdf</span> Exportar PDF</button>
+      <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
+      <button class="btn btn--primary">
+        <span class="material-icons-round">filter_alt</span> Aplicar filtro
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card filters-card">
+    <div class="filters-row">
+      <div class="fg-inline"><label>Período</label><select><option>Mes</option><option>Trimestre</option><option>Año</option></select></div>
+      <div class="fg-inline"><label>Fecha desde</label><input type="date" value="2026-01-01" /></div>
+      <div class="fg-inline"><label>Fecha hasta</label><input type="date" value="2026-09-17" /></div>
+      <div class="fg-inline"><label>Vendedor</label><select><option>Todos</option><option>Barón</option><option>Jaime</option></select></div>
+      <div class="fg-inline"><label>Moneda</label><select><option>Comercio a Soles</option><option>PEN</option><option>USD</option></select></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab==='resumen'"   (click)="setTab('resumen')">Resumen</button>
+    <button class="tab-btn" [class.active]="activeTab==='ventas'"    (click)="setTab('ventas')">Ventas y Litros</button>
+    <button class="tab-btn" [class.active]="activeTab==='clientes'"  (click)="setTab('clientes')">Clientes</button>
+    <button class="tab-btn" [class.active]="activeTab==='productos'" (click)="setTab('productos')">Productos</button>
+    <button class="tab-btn" [class.active]="activeTab==='vendedores'"(click)="setTab('vendedores')">Vendedores</button>
+  </div>
+
+  <!-- KPI row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">water_drop</span></div>
+      <div class="stat-body"><span class="stat-label">Litros vendidos</span><span class="stat-value">48.650 L</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">payments</span></div>
+      <div class="stat-body"><span class="stat-label">Clientes comercializados a soles</span><span class="stat-value">S/ 284.750</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">people</span></div>
+      <div class="stat-body"><span class="stat-label">Clientes atendidos</span><span class="stat-value">86</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">flag</span></div>
+      <div class="stat-body"><span class="stat-label">Cumplimiento meta REPSOL</span><span class="stat-value">88.5 %</span></div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="charts-row">
+    <div class="card chart-card flex-2">
+      <div class="chart-header"><h3>Litros Vendidos vs. Meta REPSOL</h3></div>
+      <div class="chart-body" style="height:230px">
+        <canvas baseChart [data]="lineData" [options]="lineOptions" type="line" *ngIf="lineData"></canvas>
+      </div>
+    </div>
+    <div class="card chart-card flex-1">
+      <div class="chart-header"><h3>Ventas por Moneda</h3></div>
+      <div class="chart-body" style="height:230px;display:flex;align-items:center;justify-content:center">
+        <canvas baseChart [data]="doughnutData" [options]="doughnutOptions" type="doughnut"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="charts-row">
+    <!-- Top clientes table -->
+    <div class="card chart-card flex-1">
+      <div class="chart-header"><h3>Top Clientes</h3></div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Cliente</th><th>Litros</th><th>Ventas S/</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let c of topClientes; let i=index">
+            <td class="rank">{{ i+1 }}</td>
+            <td>{{ c.nombre }}</td>
+            <td>{{ c.litros | number:'1.0-0' }} L</td>
+            <td class="fw-600">S/ {{ c.monto | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Top productos -->
+    <div class="card chart-card flex-1">
+      <div class="chart-header"><h3>Productos más vendidos</h3></div>
+      <div *ngFor="let p of topProductos" class="producto-row">
+        <span class="prod-name">{{ p.nombre }}</span>
+        <div class="prod-bar-wrap">
+          <div class="prod-bar" [style.width.%]="p.pct"></div>
+        </div>
+        <span class="prod-litros">{{ p.litros | number:'1.0-0' }} L</span>
+        <span class="prod-pct">{{ p.pct }}%</span>
+      </div>
+    </div>
+    <!-- Vendedores bar -->
+    <div class="card chart-card flex-1">
+      <div class="chart-header"><h3>Comparativo vendedores</h3></div>
+      <div class="chart-body" style="height:180px">
+        <canvas baseChart [data]="barVendedoresData" [options]="barOptions" type="bar" *ngIf="barVendedoresData"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

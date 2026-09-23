@@ -1,0 +1,200 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--brand-dark);
+  border-right: 1px solid rgba(255,255,255,.06);
+  transition: width var(--transition);
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  z-index: 100;
+
+  &.collapsed {
+    width: var(--sidebar-collapsed);
+    .brand__text, .nav__label, .nav__badge, .user-info { display: none; }
+    .brand__logo { justify-content: center; }
+    .toggle-btn  { margin-left: 0; }
+    .nav__item   { justify-content: center; padding: 12px 0; }
+    .sidebar-user{ justify-content: center; }
+  }
+}
+
+// ─── Brand ────────────────────────────────────────────────────────────────────
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  min-height: var(--topbar-height);
+}
+
+.brand__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand__img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.brand__name {
+  font-size: .95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .5px;
+}
+
+.brand__sub {
+  display: block;
+  font-size: .65rem;
+  color: rgba(255,255,255,.4);
+  margin-top: 1px;
+}
+
+.toggle-btn {
+  background: rgba(255,255,255,.06);
+  border: none;
+  border-radius: 6px;
+  color: rgba(255,255,255,.5);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--brand-orange);
+    color: #fff;
+  }
+
+  .material-icons-round { font-size: 18px; }
+}
+
+// ─── Nav ──────────────────────────────────────────────────────────────────────
+.nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  font-size: .85rem;
+  font-weight: 500;
+  transition: all var(--transition);
+  white-space: nowrap;
+  position: relative;
+
+  &:hover {
+    background: rgba(255,255,255,.07);
+    color: rgba(255,255,255,.9);
+    transform: translateX(2px);
+  }
+
+  &.active {
+    background: var(--brand-orange);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255,90,0,.4);
+
+    .nav__icon { color: #fff; }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 60%;
+      background: rgba(255,255,255,.6);
+      border-radius: 0 3px 3px 0;
+    }
+  }
+}
+
+.nav__icon {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,.4);
+  transition: color var(--transition);
+  flex-shrink: 0;
+}
+
+.nav__label { flex: 1; }
+
+.nav__badge {
+  background: var(--warning);
+  color: #fff;
+  border-radius: 99px;
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+
+// ─── User ─────────────────────────────────────────────────────────────────────
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--brand-orange);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-name {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.user-role {
+  display: block;
+  font-size: .68rem;
+  color: rgba(255,255,255,.35);
+}

@@ -1,0 +1,225 @@
+.dashboard { max-width: 1400px; }
+
+.header-actions { display: flex; gap: 8px; }
+
+.period-select {
+  padding: 8px 14px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface);
+  color: var(--text-primary); font-size: .85rem; cursor: pointer; outline: none;
+  &:focus { border-color: var(--brand-orange); }
+}
+
+// KPI stat cards mejoradas
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: box-shadow .2s, transform .2s;
+  &:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+}
+
+.stat-icon {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  .material-icons-round { font-size: 1.1rem; color: #fff; }
+  &--orange  { background: linear-gradient(135deg,#FF5A00,#ff7a30); }
+  &--success { background: linear-gradient(135deg,#16a34a,#22c55e); }
+  &--info    { background: linear-gradient(135deg,#0ea5e9,#38bdf8); }
+  &--warning { background: linear-gradient(135deg,#d97706,#f59e0b); }
+  &--danger  { background: linear-gradient(135deg,#dc2626,#f87171); }
+}
+
+.stat-body {
+  display: flex; flex-direction: column; gap: 3px; flex: 1;
+}
+.stat-label {
+  font-size: .68rem; font-weight: 500; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.stat-value {
+  font-size: 1.1rem; font-weight: 700; color: var(--text-primary); line-height: 1.1;
+}
+.stat-change {
+  font-size: .75rem; color: var(--text-secondary);
+  &.up   { color: #16a34a; }
+  &.down { color: var(--danger); }
+}
+
+// meta progress
+.meta-progress { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.meta-bar { flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.meta-fill { height: 100%; background: var(--brand-orange); border-radius: 99px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.meta-pct { font-size: .75rem; font-weight: 700; color: var(--brand-orange); }
+
+// charts row
+.charts-row { display: flex; gap: 16px; margin-bottom: 16px; @media (max-width:900px) { flex-direction:column; } }
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.chart-card { padding: 20px; }
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  h3 { font-size: .95rem; font-weight: 600; color: var(--text-primary); }
+}
+.see-all { font-size: .8rem; color: var(--brand-orange); font-weight: 500; }
+
+// bottom row
+.bottom-row { display: flex; gap: 16px; margin-bottom: 16px; @media (max-width:1100px) { flex-wrap:wrap; } }
+
+// vendedor card mejorado
+.vendedor-card { padding: 20px; min-width: 220px; }
+.vendedor-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; &:last-child { margin-bottom:0; } }
+.vendedor-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg,#FF5A00,#ff7a30); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; font-weight: 700; flex-shrink: 0;
+}
+.vendedor-body { flex: 1; }
+.vendedor-name { font-size: .85rem; font-weight: 600; display: block; margin-bottom: 4px; }
+.vendedor-bar-wrap { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+.vendedor-bar { height: 100%; background: linear-gradient(90deg,#FF5A00,#ff7a30); border-radius: 99px; transition: width 1s ease; }
+.vendedor-stats {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  span { font-size: .7rem; color: var(--text-secondary); background: var(--background); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); }
+}
+
+// top clientes card mejorado
+.top-clientes-card { padding: 20px; min-width: 240px; }
+.cliente-row {
+  display: grid; grid-template-columns: 22px 1fr 70px 80px;
+  align-items: center; gap: 8px; padding: 9px 0;
+  border-bottom: 1px solid var(--border); font-size: .8rem;
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--background); border-radius: 6px; padding-left: 4px; }
+}
+.rank {
+  font-weight: 800; color: #fff; background: var(--brand-orange);
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .65rem;
+}
+.c-name   { color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-litros { color: var(--text-secondary); text-align: right; font-size: .75rem; }
+.c-monto  { font-weight: 700; color: var(--text-primary); text-align: right; }
+
+// top productos con barras de progreso
+.producto-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  &:last-child { border-bottom: none; }
+}
+.prod-name   { font-size: .8rem; font-weight: 500; min-width: 90px; color: var(--text-primary); }
+.prod-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.prod-bar  { height: 100%; background: linear-gradient(90deg,#FF5A00,#ff7a30); border-radius: 99px; }
+.prod-litros { font-size: .72rem; color: var(--text-secondary); min-width: 60px; text-align: right; }
+.prod-pct  { font-size: .72rem; font-weight: 700; color: var(--brand-orange); min-width: 32px; text-align: right; }
+
+// recent card
+.recent-card { padding: 20px; }
+.table-wrap { overflow-x: auto; }
+.mono { font-family: monospace; font-size: .82rem; }
+.fw-600 { font-weight: 600; }
+
+
+// ─── Meta progress ────────────────────────────────────────────────────────────
+.meta-progress {
+  display: flex; align-items: center; gap: 8px; margin-top: 6px;
+}
+.meta-bar {
+  flex: 1; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden;
+}
+.meta-fill {
+  height: 100%; background: var(--brand-orange); border-radius: 99px;
+  transition: width 1s cubic-bezier(.4,0,.2,1);
+}
+.meta-pct { font-size: .75rem; font-weight: 700; color: var(--brand-orange); }
+
+// ─── Charts row ───────────────────────────────────────────────────────────────
+.charts-row {
+  display: flex; gap: 16px; margin-bottom: 16px;
+  @media (max-width: 900px) { flex-direction: column; }
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.chart-card { padding: 20px; }
+
+.chart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+  h3 { font-size: .95rem; font-weight: 600; color: var(--text-primary); }
+}
+
+.see-all { font-size: .8rem; color: var(--brand-orange); font-weight: 500; }
+
+// ─── Bottom row ───────────────────────────────────────────────────────────────
+.bottom-row {
+  display: flex; gap: 16px; margin-bottom: 16px;
+  @media (max-width: 1100px) { flex-wrap: wrap; }
+}
+
+// ─── Vendedor card ────────────────────────────────────────────────────────────
+.vendedor-card { padding: 20px; min-width: 220px; }
+
+.vendedor-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-bottom: 18px;
+  &:last-child { margin-bottom: 0; }
+}
+
+.vendedor-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--brand-orange); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .82rem; font-weight: 700; flex-shrink: 0;
+}
+
+.vendedor-body { flex: 1; }
+.vendedor-name { font-size: .85rem; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 4px; }
+
+.vendedor-bar-wrap {
+  height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 4px;
+}
+.vendedor-bar { height: 100%; background: var(--brand-orange); border-radius: 99px; transition: width 1s ease; }
+
+.vendedor-stats {
+  display: flex; gap: 8px;
+  span { font-size: .72rem; color: var(--text-secondary); background: var(--background); padding: 1px 6px; border-radius: 99px; }
+}
+
+// ─── Top clientes ─────────────────────────────────────────────────────────────
+.top-clientes-card { padding: 20px; min-width: 240px; }
+
+.cliente-row {
+  display: grid; grid-template-columns: 20px 1fr 70px 80px;
+  align-items: center; gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .8rem;
+  &:last-child { border-bottom: none; }
+}
+
+.rank { font-weight: 700; color: var(--brand-orange); }
+.c-name { color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-litros { color: var(--text-secondary); text-align: right; }
+.c-monto { font-weight: 600; color: var(--text-primary); text-align: right; }
+
+// ─── Recent card ──────────────────────────────────────────────────────────────
+.recent-card { padding: 20px; }
+.table-wrap { overflow-x: auto; }
+.mono { font-family: monospace; font-size: .82rem; }
+.fw-600 { font-weight: 600; }

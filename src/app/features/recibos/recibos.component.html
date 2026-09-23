@@ -1,0 +1,113 @@
+<div class="recibos animate-fade">
+  <div class="page-header">
+    <div><h1>Recibos y Abonos</h1><p class="breadcrumb">Inicio / Recibos</p></div>
+    <div class="header-actions">
+      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
+      <button class="btn btn--primary" (click)="openNew()">
+        <span class="material-icons-round">add</span> Nuevo Recibo
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">receipt_long</span></div>
+      <div class="stat-body"><span class="stat-label">Total cobrado</span><span class="stat-value">S/ {{ cobrosHoy | number:'1.0-0' }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--danger"><span class="material-icons-round">account_balance_wallet</span></div>
+      <div class="stat-body"><span class="stat-label">Saldo pendiente acum.</span><span class="stat-value">S/ {{ saldoTotal | number:'1.0-0' }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">receipt</span></div>
+      <div class="stat-body"><span class="stat-label">Total recibos</span><span class="stat-value">{{ totalRecibos }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">pending</span></div>
+      <div class="stat-body"><span class="stat-label">Con saldo pendiente</span><span class="stat-value">{{ proformasNoCobradas }}</span></div>
+    </div>
+  </div>
+
+  <div class="loading-row" *ngIf="loading()">
+    <span class="material-icons-round spin">autorenew</span> Cargando datos del servidor...
+  </div>
+
+  <div class="card table-card" *ngIf="!loading()">
+    <div class="toolbar">
+      <div class="search-bar" style="flex:1;max-width:280px">
+        <span class="material-icons-round">search</span>
+        <input placeholder="N° Recibo, cliente..."
+               [value]="search()" (input)="search.set($any($event.target).value)" />
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° Recibo</th><th>Fecha</th><th>N° Venta/Proforma</th>
+            <th>Cliente</th><th>Vendedor</th><th>Moneda</th>
+            <th>Abono</th><th>Método de Pago</th><th>Saldo Pendiente</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filtered()">
+            <td class="mono">{{ r.numero }}</td>
+            <td>{{ r.fecha }}</td>
+            <td class="mono">{{ r.proformaNro || '—' }}</td>
+            <td>{{ r.clienteNombre || '—' }}</td>
+            <td>{{ r.vendedor || '—' }}</td>
+            <td><span class="badge badge--info">{{ r.moneda }}</span></td>
+            <td class="fw-600">{{ r.moneda }} {{ r.monto | number:'1.2-2' }}</td>
+            <td>
+              <div class="metodo-cell">
+                <span class="material-icons-round">{{ metodo(r.metodoPago) }}</span>
+                {{ r.metodoPago }}
+              </div>
+            </td>
+            <td>
+              <span [class]="r.saldoPendiente > 0 ? 'saldo-pendiente' : 'saldo-ok'">
+                {{ r.moneda }} {{ r.saldoPendiente | number:'1.2-2' }}
+              </span>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="icon-btn"><span class="material-icons-round">visibility</span></button>
+                <button class="icon-btn"><span class="material-icons-round">print</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Total: {{ filtered().length }}</span>
+    </div>
+  </div>
+
+  <!-- Modal nuevo recibo -->
+  <div class="modal-backdrop" *ngIf="showNew()" (click)="close()">
+    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nuevo Recibo</h3>
+        <button class="icon-btn" (click)="close()"><span class="material-icons-round">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="recibo-form-grid">
+          <div class="fg"><label>ID Venta</label><input type="number" [(ngModel)]="reciboForm.ventaId" placeholder="Ej: 1" name="ventaId" /></div>
+          <div class="fg"><label>Monto del abono</label><input type="number" [(ngModel)]="reciboForm.monto" placeholder="0.00" name="monto" /></div>
+          <div class="fg" style="grid-column:span 2"><label>Observaciones</label><input [(ngModel)]="reciboForm.observacion" placeholder="Opcional" name="obs" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary" (click)="saveRecibo()" [disabled]="saving()">
+          <span *ngIf="!saving()"><span class="material-icons-round">save</span> Insertar Recibo</span>
+          <span *ngIf="saving()">Guardando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

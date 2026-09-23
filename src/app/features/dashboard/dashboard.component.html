@@ -1,0 +1,199 @@
+<div class="dashboard animate-fade">
+
+  <div class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="breadcrumb">Resumen ejecutivo e indicadores comerciales · Mayo 2026</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--outline" (click)="exportPDF()">
+        <span class="material-icons-round">picture_as_pdf</span> PDF
+      </button>
+      <button class="btn btn--outline" (click)="printDashboard()">
+        <span class="material-icons-round">print</span> Imprimir
+      </button>
+      <select class="period-select">
+        <option>Día</option>
+        <option>Semana</option>
+        <option selected>Mes</option>
+        <option>Trimestre</option>
+        <option>Semestre</option>
+        <option>Año</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card animate-fade" style="animation-delay:.05s">
+      <div class="stat-icon stat-icon--orange">
+        <span class="material-icons-round">local_gas_station</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Litros vendidos este mes</span>
+        <span class="stat-value">{{ stats.litrosVendidosMes | number:'1.0-0' }} L</span>
+        <span class="stat-change up">↑ 8.5% vs mes anterior</span>
+      </div>
+    </div>
+
+    <div class="stat-card animate-fade" style="animation-delay:.1s">
+      <div class="stat-icon stat-icon--info">
+        <span class="material-icons-round">flag</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Meta REPSOL</span>
+        <span class="stat-value">{{ stats.metaRepsol | number:'1.0-0' }} L</span>
+        <div class="meta-progress">
+          <div class="meta-bar">
+            <div class="meta-fill" [style.width.%]="stats.cumplimientoMeta"></div>
+          </div>
+          <span class="meta-pct">{{ stats.cumplimientoMeta }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card animate-fade" style="animation-delay:.15s">
+      <div class="stat-icon stat-icon--success">
+        <span class="material-icons-round">payments</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Total ventas del mes</span>
+        <span class="stat-value">S/ {{ stats.totalVentasMes | number:'1.0-0' }}</span>
+        <span class="stat-change up">↑ 11.4% vs mes anterior</span>
+      </div>
+    </div>
+
+    <div class="stat-card animate-fade" style="animation-delay:.2s">
+      <div class="stat-icon stat-icon--warning">
+        <span class="material-icons-round">account_balance_wallet</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Saldo pendiente acumulado</span>
+        <span class="stat-value">S/ {{ stats.saldoPendienteTotal | number:'1.0-0' }}</span>
+        <span class="stat-change down">{{ stats.recibosHoy }} recibos hoy</span>
+      </div>
+    </div>
+
+    <div class="stat-card animate-fade" style="animation-delay:.25s">
+      <div class="stat-icon stat-icon--danger">
+        <span class="material-icons-round">warning_amber</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Productos con stock bajo</span>
+        <span class="stat-value">{{ stats.productosStockBajo }}</span>
+        <span class="stat-change down">de {{ stats.totalProductos }} productos</span>
+      </div>
+    </div>
+
+    <div class="stat-card animate-fade" style="animation-delay:.3s">
+      <div class="stat-icon stat-icon--orange">
+        <span class="material-icons-round">attach_money</span>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Ventas en USD (mes)</span>
+        <span class="stat-value">US$ {{ stats.totalVentasUSD | number:'1.0-0' }}</span>
+        <span class="stat-change up">{{ stats.ventasHoy }} ventas hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="card chart-card flex-2">
+      <div class="chart-header">
+        <h3>Litros vendidos vs. Meta REPSOL</h3>
+      </div>
+      <div class="chart-body" style="height:220px">
+        <canvas baseChart [data]="lineData" [options]="lineOptions" type="line" *ngIf="lineData"></canvas>
+      </div>
+    </div>
+
+    <div class="card chart-card flex-1">
+      <div class="chart-header">
+        <h3>Ventas por Moneda</h3>
+      </div>
+      <div class="chart-body" style="height:220px; display:flex; align-items:center; justify-content:center;">
+        <canvas baseChart [data]="doughnutData" [options]="doughnutOptions" type="doughnut"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-row">
+
+    <div class="card vendedor-card">
+      <div class="chart-header"><h3>Comparativo de Vendedores</h3></div>
+      <div *ngFor="let v of vendedores" class="vendedor-item">
+        <div class="vendedor-avatar">{{ v.nombre.charAt(0) }}</div>
+        <div class="vendedor-body">
+          <span class="vendedor-name">{{ v.nombre }}</span>
+          <div class="vendedor-bar-wrap">
+            <div class="vendedor-bar" [style.width.%]="v.pct"></div>
+          </div>
+          <div class="vendedor-stats">
+            <span>S/ {{ v.monto | number:'1.0-0' }}</span>
+            <span>{{ v.litros | number:'1.0-0' }} L</span>
+            <span>{{ v.ventas }} ventas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card chart-card flex-1">
+      <div class="chart-header"><h3>Productos más vendidos</h3></div>
+      <div *ngFor="let p of topProductos" class="producto-row">
+        <span class="prod-name">{{ p.nombre }}</span>
+        <div class="prod-bar-wrap">
+          <div class="prod-bar" [style.width.%]="p.pct"></div>
+        </div>
+        <span class="prod-litros">{{ p.litros | number:'1.0-0' }} L</span>
+        <span class="prod-pct">{{ p.pct }}%</span>
+      </div>
+    </div>
+
+    <div class="card top-clientes-card">
+      <div class="chart-header">
+        <h3>Top 5 clientes por volumen</h3>
+        <a routerLink="/clientes" class="see-all">Ver todos →</a>
+      </div>
+      <div *ngFor="let c of topClientes; let i = index" class="cliente-row">
+        <span class="rank">{{ i + 1 }}</span>
+        <span class="c-name">{{ c.nombre }}</span>
+        <span class="c-litros">{{ c.litros | number:'1.0-0' }} L</span>
+        <span class="c-monto">S/ {{ c.monto | number:'1.0-0' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card recent-card">
+    <div class="chart-header">
+      <h3>Últimas operaciones</h3>
+      <a routerLink="/recibos" class="see-all">Ver todos →</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>N° Doc</th>
+            <th>Cliente</th>
+            <th>Vendedor</th>
+            <th>Producto</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of recentVentas">
+            <td>{{ v.fecha }}</td>
+            <td><span class="badge badge--info">Venta</span></td>
+            <td class="mono">{{ v.numero }}</td>
+            <td>{{ v.clienteNombre }}</td>
+            <td>{{ v.vendedor }}</td>
+            <td>{{ v.detalles.length || '—' }}</td>
+            <td class="fw-600">S/ {{ v.totalVenta | number:'1.2-2' }}</td>
+            <td><span class="badge badge--{{ ventaStatusClass(v.estado) }}">{{ v.estado }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

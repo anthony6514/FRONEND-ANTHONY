@@ -1,0 +1,132 @@
+<div class="inventario animate-fade">
+  <div class="page-header">
+    <div>
+      <h1>Inventario</h1>
+      <p class="breadcrumb">Stock / Inventario</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--outline" >
+        <span class="material-icons-round">download</span> Exportar Excel
+      </button>
+      <a routerLink="/entradas" class="btn btn--outline">
+        <span class="material-icons-round">add_circle_outline</span> Registrar entrada
+      </a>
+      <a routerLink="/salidas" class="btn btn--primary">
+        <span class="material-icons-round">remove_circle_outline</span> Nueva salida
+      </a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">category</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Total Productos</span>
+        <span class="stat-value">{{ productos.length }}</span>
+        <span class="stat-change">unidades activas</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">water_drop</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Stock total (litros)</span>
+        <span class="stat-value">{{ totalStock | number:'1.0-0' }} L</span>
+        <span class="stat-change up">en inventario</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">monetization_on</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Valor total inventario</span>
+        <span class="stat-value">S/ {{ totalValor | number:'1.2-2' }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">warning_amber</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Productos con stock bajo</span>
+        <span class="stat-value">{{ stockBajos }}</span>
+        <span class="stat-change down">requieren atención</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="toolbar">
+      <div class="search-bar" style="flex:1; max-width:340px">
+        <span class="material-icons-round">search</span>
+        <input placeholder="Buscar por código o producto..." (input)="onSearch($event)" />
+      </div>
+      <div class="filter-group">
+        <label>Largo filtro</label>
+        <select>
+          <option>Todos</option>
+          <option>Stock bajo</option>
+          <option>Sin stock</option>
+          <option>Normal</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Presentación</th>
+            <th>Precio compra</th>
+            <th>Precio venta</th>
+            <th>Stock unid.</th>
+            <th>Cant. total (L/kg)</th>
+            <th>Valor (S/)</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filtered()" [class.row-low]="stockStatus(p)==='low'" [class.row-critical]="stockStatus(p)==='critical'">
+            <td class="mono">{{ p.codigo }}</td>
+            <td>
+              <div class="product-cell">
+                <div class="product-icon">
+                  <span class="material-icons-round">water_drop</span>
+                </div>
+                <div>
+                  <span class="product-name">{{ p.nombre }}</span>
+                  <span class="product-desc">{{ p.descripcion ?? p.presentacion }}</span>
+                </div>
+              </div>
+            </td>
+            <td>{{ p.presentacion }}</td>
+            <td>S/ {{ p.precio | number:'1.2-2' }}</td>
+            <td>S/ {{ (p.precioVenta ?? p.precio) | number:'1.2-2' }}</td>
+            <td class="fw-600">{{ p.stock | number:'1.0-0' }}</td>
+            <td>{{ (p.stock * p.volumen) | number:'1.0-0' }} {{ p.unidad }}</td>
+            <td class="fw-600">S/ {{ (p.stock * p.precio) | number:'1.2-2' }}</td>
+            <td><span class="badge" [ngClass]="stockBadge(p).cls">{{ stockBadge(p).label }}</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="totals-row">
+            <td colspan="5"><strong>Totales</strong></td>
+            <td></td>
+            <td class="fw-600">{{ totalStock | number:'1.0-0' }} L</td>
+            <td class="fw-600">S/ {{ totalValor | number:'1.2-2' }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="summary-bar">
+      <div class="summary-item">
+        <span class="material-icons-round">water_drop</span>
+        <span>Litros disponibles totales: <strong>{{ totalStock | number:'1.0-0' }} L</strong></span>
+      </div>
+      <div class="summary-item">
+        <span class="material-icons-round">attach_money</span>
+        <span>Valorización total del inventario: <strong>S/ {{ totalValor | number:'1.2-2' }}</strong></span>
+      </div>
+    </div>
+  </div>
+</div>

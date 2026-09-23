@@ -1,0 +1,167 @@
+<div class="configuracion animate-fade">
+  <div class="page-header">
+    <div>
+      <h1>Configuración del Sistema</h1>
+      <p class="breadcrumb">Administración de parámetros generales y usuarios</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--primary" (click)="guardar()">
+        <span class="material-icons-round">save</span> Guardar cambios
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab() === 'general'"    (click)="setTab('general')">General</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'usuarios'"   (click)="setTab('usuarios')">Usuarios</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'vendedores'" (click)="setTab('vendedores')">Vendedores</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'monedas'"    (click)="setTab('monedas')">Monedas</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'metodos'"    (click)="setTab('metodos')">Métodos de Pago</button>
+    <button class="tab-btn" [class.active]="activeTab() === 'proformas'"  (click)="setTab('proformas')">Proformas</button>
+  </div>
+
+  <div *ngIf="activeTab() === 'general'" class="tab-content">
+    <div class="config-grid">
+
+      <div class="card config-card">
+        <h3 class="section-title">DATOS DE LA EMPRESA</h3>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Razón Social</label>
+            <input [(ngModel)]="empresa.razonSocial" name="razonSocial" />
+          </div>
+          <div class="fg">
+            <label>RUC</label>
+            <input [(ngModel)]="empresa.ruc" name="ruc" />
+          </div>
+          <div class="fg">
+            <label>Nombre Comercial</label>
+            <input [(ngModel)]="empresa.nombreComercial" name="nombreComercial" />
+          </div>
+          <div class="fg">
+            <label>Dirección</label>
+            <input [(ngModel)]="empresa.direccion" name="direccion" />
+          </div>
+          <div class="fg">
+            <label>Teléfono</label>
+            <input [(ngModel)]="empresa.telefono" name="telefono" />
+          </div>
+          <div class="fg">
+            <label>Correo</label>
+            <input [(ngModel)]="empresa.correo" name="correo" type="email" />
+          </div>
+        </div>
+
+        <div class="logo-section">
+          <p class="logo-label">Logo de la empresa</p>
+          <div class="logo-preview">
+            <div class="logo-icon">
+              <span class="drop-icon">⬡</span>
+              <span class="logo-name">BUTCOINT</span>
+              <span class="logo-sub">DISTRIBUIDOR REPSOL</span>
+            </div>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Repsol_logo.svg/320px-Repsol_logo.svg.png"
+              alt="REPSOL" class="repsol-logo-preview" />
+          </div>
+          <div class="logo-actions">
+            <button class="btn btn--outline btn--sm">
+              <span class="material-icons-round">upload</span> Cambiar logo
+            </button>
+            <span class="distribuidor-label">Distribuidor REPSOL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card config-card">
+        <h3 class="section-title">PARÁMETROS COMERCIALES</h3>
+        <div class="form-grid">
+          <div class="fg">
+            <label>Moneda principal</label>
+            <select [(ngModel)]="parametros.monedaPrincipal" name="monedaPrincipal">
+              <option>PEN - Soles</option>
+              <option>USD - Dólares</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Moneda secundaria</label>
+            <select [(ngModel)]="parametros.monedaSecundaria" name="monedaSecundaria">
+              <option>USD - Dólares</option>
+              <option>PEN - Soles</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Tipo de cambio actual</label>
+            <input [(ngModel)]="parametros.tipoCambio" name="tipoCambio" type="number" step="0.01" />
+          </div>
+          <div class="fg">
+            <label>IGV</label>
+            <select [(ngModel)]="parametros.igv" name="igv">
+              <option [value]="18">18 %</option>
+              <option [value]="10">10 %</option>
+              <option [value]="0">0 %</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Validez predeterminada de Proformas</label>
+            <select [(ngModel)]="parametros.validezProforma" name="validezProforma">
+              <option>7 dias</option>
+              <option>15 dias</option>
+              <option>30 dias</option>
+            </select>
+          </div>
+          <div class="fg toggle-row">
+            <label>Stock mínimo / alerta</label>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" [(ngModel)]="parametros.stockMinAlerta" name="stockMinAlerta" />
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label">{{ parametros.stockMinAlerta ? 'Activado' : 'Desactivado' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card numeracion-card">
+      <h3 class="section-title">NUMERACIÓN DE DOCUMENTOS</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Serie / Prefijo</th>
+            <th>Próximo número</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let n of numeracion">
+            <td>{{ n.documento }}</td>
+            <td class="mono">{{ n.serie }}</td>
+            <td class="mono">{{ n.proximoNumero }}</td>
+            <td>
+              <button class="icon-btn" title="Editar">
+                <span class="material-icons-round">edit</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-footer-global">
+      <button class="btn btn--outline">Cancelar</button>
+      <button class="btn btn--primary" (click)="guardar()">
+        <span class="material-icons-round">save</span> Guardar cambios
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="activeTab() !== 'general'" class="tab-content tab-placeholder">
+    <div class="card placeholder-card">
+      <span class="material-icons-round placeholder-icon">construction</span>
+      <p>Esta sección estará disponible cuando el backend esté conectado.</p>
+    </div>
+  </div>
+</div>

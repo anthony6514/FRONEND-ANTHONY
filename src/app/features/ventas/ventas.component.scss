@@ -1,0 +1,12 @@
+.ventas { max-width: 1400px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.filter-input, .filter-select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-primary); font-size: .8rem; &:focus { outline: none; border-color: var(--brand-orange); } }
+.btn--sm { padding: 7px 12px; font-size: .8rem; }
+.table-wrap { overflow-x: auto; }
+.fw-600 { font-weight: 600; }
+.mono   { font-family: monospace; font-size: .82rem; }
+.actions { display: flex; gap: 3px; }
+.icon-btn { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 5px; color: var(--text-secondary); transition: all var(--transition); .material-icons-round { font-size: .95rem; } &:hover { background: var(--brand-orange-soft); color: var(--brand-orange); } &--danger:hover { background: var(--danger-soft); color: var(--danger); } }
+.table-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); font-size: .82rem; color: var(--text-secondary); }
+.pagination-simple { display: flex; gap: 4px; button { padding: 4px 9px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; font-size: .78rem; &:hover, &.active { background: var(--brand-orange); color: #fff; border-color: var(--brand-orange); } } }

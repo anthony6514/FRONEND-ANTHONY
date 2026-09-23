@@ -1,0 +1,42 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand__logo">
+      <span class="brand__icon">
+        <img src="assets/logo-inventio.png" alt="INVENTIO" class="brand__img" />
+      </span>
+      <div class="brand__text" *ngIf="!collapsed">
+        <span class="brand__name">INVENTIO</span>
+        <span class="brand__sub">Gestión de inventario</span>
+      </div>
+    </div>
+    <button class="toggle-btn" (click)="toggle()" [title]="collapsed ? 'Expandir' : 'Colapsar'">
+      <span class="material-icons-round">{{ collapsed ? 'chevron_right' : 'chevron_left' }}</span>
+    </button>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a
+      *ngFor="let item of visibleItems"
+      [routerLink]="item.route"
+      routerLinkActive="active"
+      class="nav__item"
+      (click)="onNav()"
+      [title]="item.label">
+      <span class="material-icons-round nav__icon">{{ item.icon }}</span>
+      <span class="nav__label" *ngIf="!collapsed">{{ item.label }}</span>
+      <span *ngIf="item.badge && !collapsed" class="nav__badge">{{ item.badge }}</span>
+    </a>
+  </nav>
+
+  <!-- User -->
+  <div class="sidebar-user" *ngIf="auth.currentUser() as user">
+    <div class="avatar">{{ user.nombre.charAt(0) }}</div>
+    <div class="user-info" *ngIf="!collapsed">
+      <span class="user-name">{{ user.nombre }}</span>
+      <span class="user-role">{{ user.rol }}</span>
+    </div>
+  </div>
+</aside>

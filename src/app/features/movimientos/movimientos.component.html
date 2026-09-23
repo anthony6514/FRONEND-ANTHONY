@@ -1,0 +1,311 @@
+<div class="movimientos animate-fade">
+
+  <!-- ===== LISTADO ===== -->
+  <ng-container *ngIf="vista() === 'lista'">
+
+    <div class="page-header">
+      <div>
+        <h1>Movimientos</h1>
+        <p class="breadcrumb">Inventario / Movimientos</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn--outline" (click)="abrirAjuste()">
+          <span class="material-icons-round">tune</span> Ajuste
+        </button>
+        <button class="btn btn--outline btn--salida" (click)="abrirSalida()">
+          <span class="material-icons-round">remove_circle_outline</span> Nueva salida
+        </button>
+        <button class="btn btn--outline btn--entrada" (click)="abrirEntrada()">
+          <span class="material-icons-round">add_circle_outline</span> Nueva entrada
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--success"><span class="material-icons-round">add_circle</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Entradas registradas</span>
+          <span class="stat-value">{{ totalEntradas }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--danger"><span class="material-icons-round">remove_circle</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Salidas registradas</span>
+          <span class="stat-value">{{ totalSalidas }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--warning"><span class="material-icons-round">tune</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Ajustes</span>
+          <span class="stat-value">{{ totalAjustes }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--info"><span class="material-icons-round">water_drop</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Litros ingresados (mes)</span>
+          <span class="stat-value">{{ litrosIngresados | number:'1.0-0' }} L</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <div class="toolbar">
+        <div class="tabs-inline">
+          <button class="tab-pill" [class.active]="tab()==='todos'"    (click)="setTab('todos')">Todos</button>
+          <button class="tab-pill tab-entrada" [class.active]="tab()==='entradas'" (click)="setTab('entradas')">Entradas</button>
+          <button class="tab-pill tab-salida"  [class.active]="tab()==='salidas'"  (click)="setTab('salidas')">Salidas</button>
+          <button class="tab-pill tab-ajuste"  [class.active]="tab()==='ajustes'"  (click)="setTab('ajustes')">Ajustes</button>
+        </div>
+        <div class="search-bar" style="flex:1;max-width:300px">
+          <span class="material-icons-round">search</span>
+          <input placeholder="Producto, documento, usuario..."
+                 [value]="search()" (input)="search.set($any($event.target).value)" />
+        </div>
+        <input type="date" class="filter-input" value="2026-09-01" />
+        <input type="date" class="filter-input" value="2026-09-18" />
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Documento</th>
+              <th>Observación</th>
+              <th>Stock resultante</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of filtered()">
+              <td class="mono">#{{ m.id }}</td>
+              <td>
+                <span class="badge" [ngClass]="tipoBadge(m.tipoMovimiento)">
+                  <span class="material-icons-round tipo-icon">{{ tipoIcon(m.tipoMovimiento) }}</span>
+                  {{ m.tipoMovimiento }}
+                </span>
+              </td>
+              <td>{{ m.productoNombre }}</td>
+              <td class="fw-600">
+                <span [class]="m.tipoMovimiento === 'ENTRADA' ? 'qty-up' : m.tipoMovimiento === 'SALIDA' ? 'qty-down' : 'qty-adj'">
+                  {{ m.tipoMovimiento === 'SALIDA' ? '-' : '+' }}{{ m.cantidad | number:'1.0-0' }}
+                </span>
+              </td>
+              <td>{{ m.fecha }}</td>
+              <td>{{ m.usuario }}</td>
+              <td class="mono">{{ m.documentoOrigen ?? '—' }}</td>
+              <td class="obs">{{ m.observacion ?? '—' }}</td>
+              <td class="fw-600">{{ m.stockResultante | number:'1.0-0' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span>Total registros: {{ filtered().length }}</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== FORMULARIO ENTRADA ===== -->
+  <ng-container *ngIf="vista() === 'entrada'">
+    <div class="page-header">
+      <div>
+        <h1>Registrar Entrada</h1>
+        <p class="breadcrumb">Movimientos &rsaquo; Nueva entrada</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn--outline" (click)="volver()">
+          <span class="material-icons-round">arrow_back</span> Volver
+        </button>
+        <button class="btn btn--primary" (click)="guardarEntrada()">
+          <span class="material-icons-round">save</span> Guardar entrada
+        </button>
+      </div>
+    </div>
+
+    <div class="form-layout">
+      <div class="card form-card">
+        <div class="form-section-title">DATOS DE LA ENTRADA</div>
+        <div class="form-grid">
+          <div class="fg fg-wide">
+            <label>Producto</label>
+            <select [(ngModel)]="formEntrada.productoId" name="prod">
+              <option [value]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos" [value]="p.id">
+                {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
+              </option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="formEntrada.fecha" name="fecha" />
+          </div>
+          <div class="fg">
+            <label>Cantidad</label>
+            <input type="number" [(ngModel)]="formEntrada.cantidad" name="cantidad" min="1" />
+          </div>
+          <div class="fg">
+            <label>Documento de origen</label>
+            <input [(ngModel)]="formEntrada.documentoOrigen" name="doc" placeholder="OC-0024" />
+          </div>
+          <div class="fg fg-wide">
+            <label>Observación</label>
+            <input [(ngModel)]="formEntrada.observacion" name="obs" placeholder="Compra mensual..." />
+          </div>
+        </div>
+
+        <div class="costo-info" *ngIf="formEntrada.productoId > 0">
+          <span class="material-icons-round">info</span>
+          El costo de entrada se toma del precio de compra registrado en stock:
+          <strong>S/ {{ costoEntrada | number:'1.2-2' }}</strong> por unidad.
+        </div>
+      </div>
+
+      <div class="card resumen-card" *ngIf="formEntrada.productoId > 0">
+        <div class="form-section-title">RESUMEN</div>
+        <div class="resumen-row"><span>Producto</span><strong>{{ productos.find(p => p.id === +formEntrada.productoId)?.nombre }}</strong></div>
+        <div class="resumen-row"><span>Cantidad</span><strong>{{ formEntrada.cantidad | number:'1.0-0' }}</strong></div>
+        <div class="resumen-row"><span>Costo unitario</span><strong>S/ {{ costoEntrada | number:'1.2-2' }}</strong></div>
+        <div class="resumen-row resumen-total">
+          <span>Costo total</span>
+          <strong>S/ {{ formEntrada.cantidad * costoEntrada | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== FORMULARIO SALIDA ===== -->
+  <ng-container *ngIf="vista() === 'salida'">
+    <div class="page-header">
+      <div>
+        <h1>Registrar Salida</h1>
+        <p class="breadcrumb">Movimientos &rsaquo; Nueva salida</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn--outline" (click)="volver()">
+          <span class="material-icons-round">arrow_back</span> Volver
+        </button>
+        <button class="btn btn--primary" (click)="guardarSalida()">
+          <span class="material-icons-round">save</span> Guardar salida
+        </button>
+      </div>
+    </div>
+
+    <div class="form-layout">
+      <div class="card form-card">
+        <div class="form-section-title">DATOS DE LA SALIDA</div>
+        <div class="form-grid">
+          <div class="fg fg-wide">
+            <label>Producto</label>
+            <select [(ngModel)]="formSalida.productoId" name="prod">
+              <option [value]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos" [value]="p.id">
+                {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
+              </option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="formSalida.fecha" name="fecha" />
+          </div>
+          <div class="fg">
+            <label>Cantidad</label>
+            <input type="number" [(ngModel)]="formSalida.cantidad" name="cantidad" min="1" [max]="stockDisponible" />
+          </div>
+          <div class="fg">
+            <label>Precio de venta (manual)</label>
+            <input type="number" [(ngModel)]="formSalida.precioVenta" name="pv" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="fg">
+            <label>Documento de origen</label>
+            <input [(ngModel)]="formSalida.documentoOrigen" name="doc" placeholder="SAL-004" />
+          </div>
+          <div class="fg fg-wide">
+            <label>Observación</label>
+            <input [(ngModel)]="formSalida.observacion" name="obs" placeholder="Venta a cliente..." />
+          </div>
+        </div>
+
+        <div class="costo-info salida-info" *ngIf="formSalida.productoId > 0">
+          <span class="material-icons-round">inventory_2</span>
+          Stock disponible: <strong>{{ stockDisponible | number:'1.0-0' }} unidades</strong>
+        </div>
+      </div>
+
+      <div class="card resumen-card" *ngIf="formSalida.productoId > 0">
+        <div class="form-section-title">RESUMEN</div>
+        <div class="resumen-row"><span>Cantidad</span><strong>{{ formSalida.cantidad | number:'1.0-0' }}</strong></div>
+        <div class="resumen-row"><span>Precio de venta</span><strong>S/ {{ formSalida.precioVenta | number:'1.2-2' }}</strong></div>
+        <div class="resumen-row"><span>Stock tras salida</span><strong>{{ stockDisponible - formSalida.cantidad | number:'1.0-0' }}</strong></div>
+        <div class="resumen-row resumen-total">
+          <span>Importe total</span>
+          <strong>S/ {{ importeSalida | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== FORMULARIO AJUSTE ===== -->
+  <ng-container *ngIf="vista() === 'ajuste'">
+    <div class="page-header">
+      <div>
+        <h1>Registrar Ajuste</h1>
+        <p class="breadcrumb">Movimientos &rsaquo; Ajuste de inventario</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn--outline" (click)="volver()">
+          <span class="material-icons-round">arrow_back</span> Volver
+        </button>
+        <button class="btn btn--primary" (click)="guardarAjuste()">
+          <span class="material-icons-round">save</span> Guardar ajuste
+        </button>
+      </div>
+    </div>
+
+    <div class="form-layout">
+      <div class="card form-card">
+        <div class="form-section-title">DATOS DEL AJUSTE</div>
+        <div class="form-grid">
+          <div class="fg fg-wide">
+            <label>Producto</label>
+            <select [(ngModel)]="formAjuste.productoId" name="prod">
+              <option [value]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos" [value]="p.id">
+                {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
+              </option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Tipo de ajuste</label>
+            <select [(ngModel)]="formAjuste.tipoAjuste" name="tipo">
+              <option value="in">Ajuste entrada (sumar stock)</option>
+              <option value="out">Ajuste salida (restar stock)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="formAjuste.fecha" name="fecha" />
+          </div>
+          <div class="fg">
+            <label>Cantidad a ajustar</label>
+            <input type="number" [(ngModel)]="formAjuste.cantidad" name="cantidad" min="1" />
+          </div>
+          <div class="fg fg-wide">
+            <label>Motivo del ajuste</label>
+            <input [(ngModel)]="formAjuste.observacion" name="obs" placeholder="Ej: Corrección por conteo físico..." />
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

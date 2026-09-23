@@ -1,0 +1,115 @@
+<div class="proformas animate-fade">
+  <div class="page-header">
+    <div>
+      <h1>Proformas</h1>
+      <p class="breadcrumb">Inicio / Proformas</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
+      <button class="btn btn--primary" (click)="openNew()">
+        <span class="material-icons-round">add</span> Nueva proforma
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">description</span></div>
+      <div class="stat-body"><span class="stat-label">Total proformas</span><span class="stat-value">{{ totalProformas }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">calendar_month</span></div>
+      <div class="stat-body"><span class="stat-label">Proformas del mes</span><span class="stat-value">{{ delMes }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">check_circle</span></div>
+      <div class="stat-body"><span class="stat-label">Proformas aprobadas</span><span class="stat-value">{{ aprobadas }}</span></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">monetization_on</span></div>
+      <div class="stat-body"><span class="stat-label">Monto proformado del mes</span><span class="stat-value">S/ {{ montoMes | number:'1.0-0' }}</span></div>
+    </div>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-row" *ngIf="loading()">
+    <span class="material-icons-round spin">autorenew</span> Cargando datos del servidor...
+  </div>
+
+  <!-- Table card -->
+  <div class="card table-card" *ngIf="!loading()">
+    <div class="toolbar">
+      <div class="search-bar" style="flex:1;max-width:300px">
+        <span class="material-icons-round">search</span>
+        <input placeholder="N° proforma, cliente, vendedor..."
+               [value]="search()" (input)="search.set($any($event.target).value)" />
+      </div>
+      <select class="filter-select"><option>Estado: Todos</option><option>EMITIDA</option><option>ANULADA</option></select>
+      <select class="filter-select"><option>Vendedor: Todos</option><option>Barón</option><option>Jaime</option></select>
+      <select class="filter-select"><option>Moneda: Todos</option><option>PEN</option><option>USD</option></select>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>N° Proforma</th><th>Fecha</th><th>F. Vence</th>
+            <th>Cliente</th><th>Vendedor</th><th>Moneda</th>
+            <th>Total</th><th>Estado</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filtered()">
+            <td class="mono">{{ p.numero }}</td>
+            <td>{{ p.fecha }}</td>
+            <td>{{ p.fechaVence || '—' }}</td>
+            <td>{{ p.clienteNombre }}</td>
+            <td>{{ p.vendedor }}</td>
+            <td><span class="badge badge--info">{{ p.moneda }}</span></td>
+            <td class="fw-600">S/ {{ p.total | number:'1.2-2' }}</td>
+            <td><span class="badge" [ngClass]="estadoBadge(p.estado)">{{ p.estado }}</span></td>
+            <td>
+              <div class="actions">
+                <button class="icon-btn" title="Ver"><span class="material-icons-round">visibility</span></button>
+                <button class="icon-btn" title="PDF"><span class="material-icons-round">picture_as_pdf</span></button>
+                <button class="icon-btn" title="Editar"><span class="material-icons-round">edit</span></button>
+                <button class="icon-btn icon-btn--danger" title="Anular"><span class="material-icons-round">delete</span></button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Total: {{ filtered().length }}</span>
+      <span class="fw-600">Total: S/ {{ montoMes | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- Modal nueva proforma -->
+  <div class="modal-backdrop" *ngIf="showNew()" (click)="close()">
+    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nueva Proforma</h3>
+        <button class="icon-btn" (click)="close()"><span class="material-icons-round">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="mock-form-grid">
+          <div class="fg"><label>N° Proforma</label><input [value]="'PRO-' + (totalProformas + 1)" readonly /></div>
+          <div class="fg"><label>Fecha</label><input type="date" /></div>
+          <div class="fg"><label>Vendedor</label><select><option>Barón</option><option>Jaime</option></select></div>
+          <div class="fg"><label>Moneda</label><select><option>PEN – Soles</option><option>USD – Dólares</option></select></div>
+          <div class="fg" style="grid-column:span 2"><label>Cliente</label><input placeholder="Buscar cliente..." /></div>
+        </div>
+        <div class="modal-hint"><span class="material-icons-round">info</span> Conecta el backend para guardar proformas reales.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary"><span class="material-icons-round">save</span> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>

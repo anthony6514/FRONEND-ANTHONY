@@ -1,0 +1,93 @@
+.clientes { max-width: 1400px; }
+.header-actions { display: flex; gap: 8px; }
+
+.layout-split {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+
+.table-card {
+  flex: 1; overflow: hidden; min-width: 0;
+  transition: flex var(--transition);
+}
+
+.toolbar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+}
+
+.filter-select {
+  padding: 8px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface);
+  color: var(--text-primary); font-size: .82rem; cursor: pointer;
+  &:focus { outline: none; border-color: var(--brand-orange); }
+}
+
+.table-wrap { overflow-x: auto; }
+
+.cliente-name-cell {
+  display: flex; align-items: center; gap: 8px;
+}
+.cli-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--brand-orange-soft); color: var(--brand-orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; flex-shrink: 0;
+}
+
+.saldo-pendiente { color: var(--warning); font-weight: 600; }
+.saldo-ok        { color: var(--success); font-weight: 600; }
+.fw-600 { font-weight: 600; }
+.mono   { font-family: monospace; font-size: .82rem; }
+
+.actions { display: flex; gap: 4px; }
+.icon-btn {
+  background: none; border: none; cursor: pointer; padding: 5px;
+  border-radius: 6px; color: var(--text-secondary);
+  transition: all var(--transition);
+  .material-icons-round { font-size: 1rem; }
+  &:hover { background: var(--brand-orange-soft); color: var(--brand-orange); }
+}
+
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+}
+.pg-info { font-size: .8rem; color: var(--text-secondary); }
+.pg-buttons { display: flex; gap: 4px; }
+.pg-btn {
+  padding: 5px 10px; border: 1px solid var(--border); border-radius: 5px;
+  background: var(--surface); color: var(--text-secondary); cursor: pointer;
+  font-size: .8rem; transition: all var(--transition);
+  &:hover, &.active { background: var(--brand-orange); color: #fff; border-color: var(--brand-orange); }
+}
+
+// ─── Side form ────────────────────────────────────────────────────────────────
+.side-form {
+  width: 320px; flex-shrink: 0;
+  padding: 0; overflow: hidden;
+}
+
+.form-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  h3 { font-size: .95rem; font-weight: 600; }
+}
+
+.form-body { padding: 16px 20px; }
+
+.fg {
+  margin-bottom: 14px;
+  label { display: block; font-size: .75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; }
+  input, select {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text-primary); font-size: .85rem;
+    font-family: inherit; transition: border-color var(--transition);
+    &:focus { outline: none; border-color: var(--brand-orange); }
+  }
+}
+
+.form-footer {
+  display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;
+  padding-top: 16px; border-top: 1px solid var(--border);
+}

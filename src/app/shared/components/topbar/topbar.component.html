@@ -1,0 +1,48 @@
+<header class="topbar">
+  <!-- Left: breadcrumb slot -->
+  <div class="topbar__left">
+    <div class="repsol-badge">
+      <img src="assets/logo-inventio.png" alt="INVENTIO" class="repsol-logo" />
+    </div>
+  </div>
+
+  <!-- Right: actions -->
+  <div class="topbar__right">
+    <!-- Sound toggle -->
+    <button class="action-btn" (click)="toggleSound()" [title]="sound.isEnabled() ? 'Silenciar' : 'Activar sonido'">
+      <span class="material-icons-round">{{ sound.isEnabled() ? 'volume_up' : 'volume_off' }}</span>
+    </button>
+
+    <!-- Theme toggle -->
+    <button class="action-btn" (click)="toggleTheme()" [title]="theme.isDark() ? 'Modo claro' : 'Modo oscuro'">
+      <span class="material-icons-round">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
+    </button>
+
+    <!-- Notifications -->
+    <button class="action-btn notif-btn">
+      <span class="material-icons-round">notifications</span>
+      <span class="notif-dot"></span>
+    </button>
+
+    <!-- User menu -->
+    <div class="user-chip" (click)="showUserMenu = !showUserMenu" *ngIf="auth.currentUser() as user">
+      <div class="chip-avatar">{{ user.nombre.charAt(0) }}</div>
+      <div class="chip-info">
+        <span class="chip-name">{{ user.nombre }}</span>
+        <span class="chip-role">{{ user.rol }}</span>
+      </div>
+      <span class="material-icons-round chip-arrow">{{ showUserMenu ? 'expand_less' : 'expand_more' }}</span>
+
+      <!-- Dropdown -->
+      <div class="user-dropdown" *ngIf="showUserMenu">
+        <a [routerLink]="['/usuarios']" class="dropdown-item">
+          <span class="material-icons-round">manage_accounts</span> Mi perfil
+        </a>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item danger" (click)="logout()">
+          <span class="material-icons-round">logout</span> Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

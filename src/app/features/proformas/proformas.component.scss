@@ -1,0 +1,244 @@
+.proformas { max-width: 1600px; }
+
+.header-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.btn--success { color: #16a34a; border-color: #16a34a; &:hover { background: #f0fdf4; } }
+.btn--danger  { color: var(--danger); border-color: var(--danger); &:hover { background: var(--danger-soft); } }
+
+// toolbar listado
+.toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+}
+.filter-input, .filter-select {
+  padding: 7px 10px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); background: var(--surface);
+  color: var(--text-primary); font-size: .8rem; cursor: pointer;
+  &:focus { outline: none; border-color: var(--brand-orange); }
+}
+.btn--sm  { padding: 6px 12px; font-size: .8rem; }
+.table-wrap { overflow-x: auto; }
+.fw-600 { font-weight: 600; }
+.mono   { font-family: monospace; font-size: .82rem; }
+.actions { display: flex; gap: 3px; }
+.icon-btn {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  border-radius: 5px; color: var(--text-secondary); transition: all .15s;
+  .material-icons-round { font-size: .95rem; }
+  &:hover { background: var(--brand-orange-soft); color: var(--brand-orange); }
+  &--danger:hover { background: var(--danger-soft); color: var(--danger); }
+}
+.table-footer {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  font-size: .82rem; color: var(--text-secondary);
+}
+.pagination-simple {
+  display: flex; gap: 4px;
+  button {
+    padding: 4px 9px; border: 1px solid var(--border);
+    border-radius: 4px; background: var(--surface); cursor: pointer; font-size: .78rem;
+    &:hover, &.active { background: var(--brand-orange); color: #fff; border-color: var(--brand-orange); }
+  }
+}
+
+// ── layout nueva proforma ───────────────────────────────────────────────────
+.pf-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+.pf-form { display: flex; flex-direction: column; gap: 16px; }
+
+.pf-card { padding: 20px; }
+
+.pf-header-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  align-items: end;
+
+  @media (max-width: 700px) { grid-template-columns: 1fr 1fr; }
+}
+
+.badge-estado {
+  display: inline-flex; align-items: center; padding: 5px 12px;
+  border-radius: 20px; font-size: .78rem; font-weight: 700; letter-spacing: .04em;
+}
+.badge-borrador { background: #fef3c7; color: #d97706; }
+.badge-emitida  { background: #dcfce7; color: #16a34a; }
+.badge-anulada  { background: #fee2e2; color: #dc2626; }
+
+.pf-section-title {
+  font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+  color: var(--text-secondary); text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+}
+
+.pf-cliente-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  .fg-wide { grid-column: span 2; }
+}
+
+.input-search {
+  position: relative;
+  input { width: 100%; padding-right: 32px; }
+  .material-icons-round {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-size: 1rem; color: var(--text-secondary); pointer-events: none;
+  }
+}
+
+// campos del formulario
+.fg {
+  display: flex; flex-direction: column; gap: 5px;
+
+  label {
+    font-size: .72rem; font-weight: 600; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: .04em;
+  }
+
+  input, select, textarea {
+    padding: 8px 11px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--background);
+    color: var(--text-primary); font-size: .85rem; font-family: inherit;
+    transition: border-color .15s;
+    &:focus { outline: none; border-color: var(--brand-orange); }
+  }
+
+  textarea { resize: vertical; }
+}
+
+.input-readonly { background: var(--surface) !important; color: var(--text-secondary); }
+
+// tabla de detalle editable
+.pf-detalle-table {
+  td { padding: 4px 6px; }
+}
+.cell-input {
+  width: 100%; padding: 5px 7px; border: 1px solid var(--border);
+  border-radius: 4px; background: var(--background); color: var(--text-primary);
+  font-size: .8rem; font-family: inherit;
+  &:focus { outline: none; border-color: var(--brand-orange); }
+}
+.cell-num { width: 70px; text-align: right; }
+
+.add-linea { margin: 12px 0 4px; }
+
+// totales
+.pf-adicional-grid {
+  display: grid; grid-template-columns: 1fr 260px; gap: 24px;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+}
+.pf-adicional-left { display: flex; flex-direction: column; gap: 12px; }
+
+.pf-totales {
+  border-left: 1px solid var(--border); padding-left: 20px;
+  display: flex; flex-direction: column; gap: 10px; justify-content: center;
+}
+.total-row {
+  display: flex; justify-content: space-between;
+  font-size: .88rem; color: var(--text-secondary);
+}
+.total-final {
+  font-size: 1.1rem; font-weight: 700; color: var(--brand-orange);
+  border-top: 2px solid var(--brand-orange); padding-top: 10px; margin-top: 4px;
+}
+
+// ── Vista previa PDF ────────────────────────────────────────────────────────
+.pf-preview {
+  position: sticky; top: 80px;
+}
+
+.preview-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+  color: var(--text-secondary); text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.pdf-sheet {
+  background: #fff; border: 1px solid #ddd;
+  border-radius: 6px; padding: 18px;
+  font-size: .72rem; color: #222;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
+  line-height: 1.4;
+}
+
+.pdf-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 2px solid #FF5A00; padding-bottom: 10px; margin-bottom: 10px;
+}
+.pdf-logo-block {
+  display: flex; gap: 10px; align-items: center;
+  .pdf-repsol-logo { width: 60px; object-fit: contain; }
+}
+.pdf-empresa {
+  display: flex; flex-direction: column; gap: 1px;
+  strong { font-size: .8rem; }
+  span { font-size: .65rem; color: #555; }
+}
+.pdf-doc-block {
+  text-align: right;
+  .pdf-doc-title { font-size: .95rem; font-weight: 800; color: #1F2428; letter-spacing: .05em; }
+  .pdf-doc-num   { font-size: .78rem; font-weight: 700; color: #FF5A00; }
+  .pdf-doc-fecha { font-size: .65rem; color: #555; }
+}
+
+.pdf-cliente-block {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  background: #f9f9f9; border-radius: 4px; padding: 8px;
+  margin-bottom: 10px;
+}
+.pdf-block-title {
+  font-size: .65rem; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: #FF5A00; margin-bottom: 4px;
+}
+.pdf-info-table {
+  width: 100%; border-collapse: collapse;
+  td { padding: 2px 4px; font-size: .65rem; }
+  td:first-child { color: #777; white-space: nowrap; padding-right: 8px; }
+  td:last-child { font-weight: 600; }
+}
+
+.pdf-table {
+  width: 100%; border-collapse: collapse; margin-bottom: 8px;
+  thead tr { background: #1F2428; color: #fff; }
+  th { padding: 5px 6px; font-size: .6rem; letter-spacing: .04em; text-align: left; }
+  td { padding: 4px 6px; font-size: .65rem; border-bottom: 1px solid #eee; }
+  .center { text-align: center; }
+  .right  { text-align: right; }
+}
+
+.pdf-totales {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 3px; margin-bottom: 10px;
+}
+.pdf-total-row {
+  display: flex; gap: 40px; justify-content: flex-end;
+  font-size: .7rem; color: #555;
+  span:last-child { min-width: 80px; text-align: right; font-weight: 600; color: #222; }
+}
+.pdf-total-final {
+  background: #FF5A00; color: #fff !important; padding: 5px 10px;
+  border-radius: 4px; font-weight: 800; font-size: .8rem;
+  span { color: #fff !important; }
+}
+
+.pdf-condiciones {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  background: #fff8f5; border: 1px solid #ffe4d4; border-radius: 4px;
+  padding: 8px; margin-bottom: 8px;
+  strong { font-size: .62rem; text-transform: uppercase; color: #FF5A00; display: block; margin-bottom: 3px; }
+  p { margin: 1px 0; font-size: .62rem; color: #555; }
+}
+
+.pdf-footer {
+  display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+  border-top: 1px solid #eee; padding-top: 6px;
+  font-size: .6rem; color: #777;
+  .material-icons-round { font-size: .75rem; }
+  .pdf-web { margin-left: auto; font-weight: 700; color: #FF5A00; }
+}
