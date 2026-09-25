@@ -9,7 +9,9 @@
         <p class="breadcrumb">Inicio / Proformas</p>
       </div>
       <div class="header-actions">
-        <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+        <button class="btn btn--outline" (click)="exportarExcel()">
+          <span class="material-icons-round">download</span> Exportar Excel
+        </button>
         <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
         <button class="btn btn--primary" (click)="openNew()">
           <span class="material-icons-round">add</span> Nueva proforma
@@ -94,11 +96,6 @@
               <td><span class="badge" [ngClass]="estadoBadge(p.estado)">{{ p.estado }}</span></td>
               <td>
                 <div class="actions">
-                  <!-- Ver detalle -->
-                  <button class="icon-btn" title="Ver detalle"
-                          (click)="verDetalle(p)">
-                    <span class="material-icons-round">visibility</span>
-                  </button>
                   <!-- Descargar PDF -->
                   <button class="icon-btn" title="Descargar PDF"
                           (click)="descargarPdf(p)"

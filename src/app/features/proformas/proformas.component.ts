@@ -6,6 +6,7 @@ import { SoundService }  from '../../core/services/sound.service';
 import { ApiService }    from '../../core/services/api.service';
 import { Proforma, Producto, Cliente } from '../../core/models';
 import { AuthService }   from '../../core/services/auth.service';
+import { ExportService } from '../../core/services/export.service';
 
 export interface LineaDetalle {
   productoId:     number;
@@ -29,6 +30,7 @@ export class ProformasComponent implements OnInit {
   sound = inject(SoundService);
   api   = inject(ApiService);
   auth  = inject(AuthService);
+  exp   = inject(ExportService);
 
   // ── Signals para que computed() detecte cambios ────────────────────────────
   proformas = signal<Proforma[]>([]);
@@ -215,6 +217,23 @@ export class ProformasComponent implements OnInit {
         this.saving.set(false);
       },
     });
+  }
+
+  // ── Exportar Excel ────────────────────────────────────────────────────────
+  exportarExcel() {
+    const rows = this.proformas().map(p => ({
+      'N° Proforma':  p.numero,
+      'Fecha':        p.fecha,
+      'Cliente':      p.clienteNombre,
+      'Vendedor':     p.vendedor,
+      'Moneda':       p.moneda,
+      'Subtotal':     p.subtotal,
+      'IGV':          p.igv,
+      'Total':        p.total,
+      'Estado':       p.estado,
+    }));
+    this.exp.toExcel(rows, `Proformas-${new Date().toISOString().slice(0,10)}`, 'Proformas');
+    this.sound.play('success');
   }
 
   // ── Ver detalle ────────────────────────────────────────────────────────────
