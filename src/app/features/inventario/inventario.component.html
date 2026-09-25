@@ -183,7 +183,7 @@
               <option *ngFor="let p of productos()" [value]="p.id">{{ p.nombre }}</option>
             </select>
           </div>
-          <div class="fg"><label>Cantidad</label><input type="number" [(ngModel)]="formEntrada.cantidad" placeholder="100" /></div>
+          <div class="fg"><label>Cantidad</label><input type="number" min="1" [(ngModel)]="formEntrada.cantidad" placeholder="Ej: 100" /></div>
           <div class="fg"><label>N° Documento origen</label><input [(ngModel)]="formEntrada.documentoOrigen" placeholder="OC-2026-001" /></div>
           <div class="fg" style="grid-column:span 2"><label>Observación</label><input [(ngModel)]="formEntrada.observacion" placeholder="Opcional" /></div>
         </div>

@@ -32,7 +32,7 @@ export class InventarioComponent implements OnInit {
   productos = signal<Producto[]>([]);
 
   formProd    = { codigo:'', nombre:'', descripcion:'', presentacion:'', volumen:1, unidad:'L', costoUnitario:0 };
-  formEntrada = { productoId:'', cantidad:0, documentoOrigen:'', observacion:'' };
+  formEntrada = { productoId:'' as string, cantidad:null as number | null, documentoOrigen:'', observacion:'' };
 
   ngOnInit() { this.cargar(); }
 
@@ -107,7 +107,7 @@ export class InventarioComponent implements OnInit {
   }
 
   openRegistrarEntrada() {
-    this.formEntrada = { productoId:'', cantidad:0, documentoOrigen:'', observacion:'' };
+    this.formEntrada = { productoId:'', cantidad:null, documentoOrigen:'', observacion:'' };
     this.errorMsg = '';
     this.showEntradaForm.set(true);
     this.sound.play('click');
@@ -133,8 +133,11 @@ export class InventarioComponent implements OnInit {
   }
 
   guardarEntrada() {
-    if (!this.formEntrada.productoId || !this.formEntrada.cantidad) {
-      this.errorMsg = 'Producto y cantidad son obligatorios.'; return;
+    if (!this.formEntrada.productoId) {
+      this.errorMsg = 'Selecciona un producto.'; return;
+    }
+    if (!this.formEntrada.cantidad || +this.formEntrada.cantidad < 1) {
+      this.errorMsg = 'La cantidad debe ser mayor a 0.'; return;
     }
     this.saving.set(true); this.errorMsg = '';
     this.api.registrarEntrada({
@@ -144,7 +147,10 @@ export class InventarioComponent implements OnInit {
       observacion:     this.formEntrada.observacion     || undefined,
     }).subscribe({
       next: () => { this.sound.play('success'); this.saving.set(false); this.closeModals(); this.cargar(); },
-      error: e  => { this.errorMsg = e?.message ?? 'Error al registrar.'; this.saving.set(false); }
+      error: e  => {
+        this.errorMsg = e?.message ?? e?.error?.message ?? 'Error al registrar la entrada. Verifica conexión con el servidor.';
+        this.saving.set(false);
+      }
     });
   }
 }
