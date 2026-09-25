@@ -51,8 +51,14 @@
       <input type="date" class="filter-input" value="2026-05-01" />
       <input type="date" class="filter-input" value="2026-09-17" />
       <select class="filter-select"><option>Estado: Todos</option><option>PENDIENTE</option><option>PAGADA</option><option>PARCIAL</option><option>ANULADA</option></select>
-      <button class="btn btn--primary btn--sm">Buscar</button>
-      <button class="btn btn--ghost btn--sm">Limpiar</button>
+      <select class="filter-select"
+              [value]="filtroMoneda()"
+              (change)="filtroMoneda.set($any($event.target).value)">
+        <option value="TODOS">Moneda: Todos</option>
+        <option value="PEN">Soles (S/)</option>
+        <option value="USD">Dólares ($)</option>
+      </select>
+      <button class="btn btn--ghost btn--sm" (click)="filtroMoneda.set('TODOS')">Limpiar</button>
     </div>
 
     <div class="table-wrap">

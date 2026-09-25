@@ -40,6 +40,7 @@ export class ProformasComponent implements OnInit {
   loading  = signal(true);
   search   = signal('');
   showNew  = signal(false);
+  filtroMoneda = signal<'TODOS' | 'PEN' | 'USD'>('TODOS');
 
   // ── Modal de detalle ───────────────────────────────────────────────────────
   proformaSeleccionada = signal<Proforma | null>(null);
@@ -88,7 +89,9 @@ export class ProformasComponent implements OnInit {
   // ── Tabla ──────────────────────────────────────────────────────────────────
   filtered = computed(() => {
     const q    = this.search().toLowerCase();
-    const list = this.proformas();
+    const mon  = this.filtroMoneda();
+    let list   = this.proformas();
+    if (mon !== 'TODOS') list = list.filter(p => p.moneda === mon);
     return q
       ? list.filter(p =>
           p.numero.toLowerCase().includes(q) ||

@@ -40,6 +40,14 @@
         <input placeholder="N° Recibo, cliente..."
                [value]="search()" (input)="search.set($any($event.target).value)" />
       </div>
+      <select class="filter-select"
+              [value]="filtroMoneda()"
+              (change)="filtroMoneda.set($any($event.target).value)">
+        <option value="TODOS">Moneda: Todos</option>
+        <option value="PEN">Soles (S/)</option>
+        <option value="USD">Dólares ($)</option>
+      </select>
+      <button class="btn btn--ghost btn--sm" (click)="filtroMoneda.set('TODOS')">Limpiar</button>
     </div>
 
     <div class="table-wrap">

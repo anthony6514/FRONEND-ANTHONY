@@ -25,6 +25,7 @@ export class RecibosComponent implements OnInit {
   search  = signal('');
   showNew = signal(false);
   saving  = signal(false);
+  filtroMoneda = signal<'TODOS' | 'PEN' | 'USD'>('TODOS');
 
   reciboForm = { ventaId: '', monto: '', observacion: '' };
 
@@ -37,7 +38,9 @@ export class RecibosComponent implements OnInit {
 
   filtered = computed(() => {
     const q    = this.search().toLowerCase();
-    const list = this.recibos();
+    const mon  = this.filtroMoneda();
+    let list   = this.recibos();
+    if (mon !== 'TODOS') list = list.filter(r => r.moneda === mon);
     return q ? list.filter(r =>
       r.numero.toLowerCase().includes(q) ||
       (r.clienteNombre ?? '').toLowerCase().includes(q) ||

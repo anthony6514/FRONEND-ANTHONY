@@ -21,6 +21,7 @@ export class VentasComponent implements OnInit {
   ventas  = signal<Venta[]>([]);
   loading = signal(true);
   search  = signal('');
+  filtroMoneda = signal<'TODOS' | 'PEN' | 'USD'>('TODOS');
 
   ngOnInit() {
     this.ds.getVentasHttp().subscribe({
@@ -31,7 +32,9 @@ export class VentasComponent implements OnInit {
 
   filtered = computed(() => {
     const q    = this.search().toLowerCase();
-    const list = this.ventas();
+    const mon  = this.filtroMoneda();
+    let list   = this.ventas();
+    if (mon !== 'TODOS') list = list.filter(v => v.moneda === mon);
     return q ? list.filter(v =>
       v.numero.toLowerCase().includes(q) ||
       v.clienteNombre.toLowerCase().includes(q) ||

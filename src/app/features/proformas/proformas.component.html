@@ -70,8 +70,12 @@
         <select class="filter-select">
           <option>Vendedor: Todos</option>
         </select>
-        <select class="filter-select">
-          <option>Moneda: Todos</option><option>PEN</option><option>USD</option>
+        <select class="filter-select"
+                [value]="filtroMoneda()"
+                (change)="filtroMoneda.set($any($event.target).value)">
+          <option value="TODOS">Moneda: Todos</option>
+          <option value="PEN">Soles (S/)</option>
+          <option value="USD">Dólares ($)</option>
         </select>
       </div>
 
