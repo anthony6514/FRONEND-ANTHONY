@@ -2,8 +2,8 @@
   <div class="page-header">
     <div><h1>Recibos y Abonos</h1><p class="breadcrumb">Inicio / Recibos</p></div>
     <div class="header-actions">
-      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
-      <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
+      <button class="btn btn--outline" (click)="exportarExcel()"><span class="material-icons-round">download</span> Exportar Excel</button>
+      <button class="btn btn--outline" (click)="imprimir()"><span class="material-icons-round">print</span> Imprimir</button>
       <button class="btn btn--primary" (click)="openNew()">
         <span class="material-icons-round">add</span> Nuevo Recibo
       </button>

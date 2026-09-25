@@ -60,13 +60,20 @@
           <button class="tab-pill tab-salida"  [class.active]="tab()==='salidas'"  (click)="setTab('salidas')">Salidas</button>
           <button class="tab-pill tab-ajuste"  [class.active]="tab()==='ajustes'"  (click)="setTab('ajustes')">Ajustes</button>
         </div>
-        <div class="search-bar" style="flex:1;max-width:300px">
+        <!-- Selector de producto para ver su kardex -->
+        <select class="filter-input" style="min-width:200px"
+                (change)="verKardex($any($event.target).value)">
+          <option value="">— Todos los productos —</option>
+          <option *ngFor="let p of productos()" [value]="p.id"
+                  [selected]="p.id === productoActual()">
+            {{ p.nombre }} (Stock: {{ p.stock | number:'1.0-0' }})
+          </option>
+        </select>
+        <div class="search-bar" style="flex:1;max-width:260px">
           <span class="material-icons-round">search</span>
-          <input placeholder="Producto, documento, usuario..."
+          <input placeholder="Buscar documento u observación..."
                  [value]="search()" (input)="search.set($any($event.target).value)" />
         </div>
-        <input type="date" class="filter-input" value="2026-09-01" />
-        <input type="date" class="filter-input" value="2026-09-18" />
       </div>
 
       <div class="table-wrap">

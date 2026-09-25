@@ -62,3 +62,43 @@
   .material-icons-round { color: var(--brand-orange); font-size: 1.1rem; }
   strong { color: var(--text-primary); }
 }
+
+// ── Modales ────────────────────────────────────────────────────────────────
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 300; backdrop-filter: blur(3px);
+}
+.modal-card {
+  background: var(--surface); border-radius: var(--radius-lg);
+  width: min(540px, 95vw); box-shadow: var(--shadow-lg);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+  h3 { font-size: 1.05rem; font-weight: 600; margin: 0; }
+}
+.modal-body  { padding: 20px 24px; }
+.modal-footer {
+  display: flex; gap: 8px; justify-content: flex-end;
+  padding: 14px 20px; border-top: 1px solid var(--border);
+}
+.mock-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.fg {
+  display: flex; flex-direction: column; gap: 6px;
+  label { font-size: .8rem; font-weight: 500; color: var(--text-secondary); }
+  input, select {
+    padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--surface);
+    color: var(--text-primary); font-size: .875rem;
+    &:focus { outline: none; border-color: var(--brand-orange); }
+  }
+}
+.alert-error {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: var(--danger-soft, rgba(239,68,68,.1));
+  color: var(--danger, #ef4444); border-radius: var(--radius-sm);
+  font-size: .85rem; margin-bottom: 14px;
+}

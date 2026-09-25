@@ -11,10 +11,10 @@
       <button class="btn btn--outline" (click)="openRegistrarEntrada()">
         <span class="material-icons-round">add_circle_outline</span> Registrar entrada
       </button>
-      <button class="btn btn--outline">
+      <button class="btn btn--outline" (click)="exportarExcel()">
         <span class="material-icons-round">download</span> Exportar Excel
       </button>
-      <button class="btn btn--outline">
+      <button class="btn btn--outline" (click)="imprimir()">
         <span class="material-icons-round">print</span> Imprimir
       </button>
     </div>
@@ -61,12 +61,12 @@
         <input placeholder="Buscar por código o producto..." (input)="onSearch($event)" />
       </div>
       <div class="filter-group">
-        <label>Largo filtro</label>
-        <select>
-          <option>Todos</option>
-          <option>Stock bajo</option>
-          <option>Sin stock</option>
-          <option>Normal</option>
+        <label>Filtrar por stock</label>
+        <select (change)="onFiltroStock($event)">
+          <option value="todos">Todos</option>
+          <option value="bajo">Stock bajo</option>
+          <option value="critico">Sin stock</option>
+          <option value="normal">Normal</option>
         </select>
       </div>
     </div>

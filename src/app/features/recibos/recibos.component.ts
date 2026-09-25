@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from '../../core/services/data.service';
 import { ApiService } from '../../core/services/api.service';
 import { SoundService } from '../../core/services/sound.service';
+import { ExportService } from '../../core/services/export.service';
 import { Recibo } from '../../core/models';
 
 @Component({
@@ -17,8 +18,8 @@ export class RecibosComponent implements OnInit {
   ds    = inject(DataService);
   api   = inject(ApiService);
   sound = inject(SoundService);
+  exp   = inject(ExportService);
 
-  // Signal para que computed() detecte cambios
   recibos = signal<Recibo[]>([]);
   loading = signal(true);
   search  = signal('');
@@ -52,10 +53,28 @@ export class RecibosComponent implements OnInit {
   metodo(m: string) {
     const icons: Record<string, string> = {
       TRANSFERENCIA: 'swap_horiz', EFECTIVO: 'payments',
-      CHEQUE:        'article',    DEPOSITO: 'account_balance'
+      CHEQUE: 'article', DEPOSITO: 'account_balance'
     };
     return icons[m] ?? 'payment';
   }
+
+  exportarExcel() {
+    const rows = this.filtered().map(r => ({
+      'N° Recibo':        r.numero,
+      'Fecha':            r.fecha,
+      'N° Venta/Proforma':r.proformaNro ?? '',
+      'Cliente':          r.clienteNombre ?? '',
+      'Vendedor':         r.vendedor ?? '',
+      'Moneda':           r.moneda,
+      'Abono':            r.monto,
+      'Método de pago':   r.metodoPago,
+      'Saldo pendiente':  r.saldoPendiente,
+    }));
+    this.exp.toExcel(rows, `Recibos-${new Date().toISOString().slice(0,10)}`, 'Recibos');
+    this.sound.play('success');
+  }
+
+  imprimir() { this.sound.play('click'); window.print(); }
 
   openNew() { this.showNew.set(true); this.sound.play('click'); }
 
@@ -83,3 +102,4 @@ export class RecibosComponent implements OnInit {
 
   close() { this.showNew.set(false); }
 }
+
