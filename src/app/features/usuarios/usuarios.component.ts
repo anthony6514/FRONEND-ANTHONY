@@ -31,7 +31,7 @@ export class UsuariosComponent implements OnInit {
     nombre:   '',
     email:    '',
     password: '',
-    rol:      'VENDEDOR' as 'ADMIN' | 'SUPERVISOR' | 'VENDEDOR',
+    rol:      'VENDEDOR' as 'ADMIN' | 'VENDEDOR',
   };
   showPass = false;
 

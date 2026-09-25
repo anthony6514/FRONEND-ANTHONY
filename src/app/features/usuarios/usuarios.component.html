@@ -193,14 +193,6 @@
                   <small>Crea proformas, ventas y recibos de sus clientes</small>
                 </div>
               </label>
-              <label class="rol-option" [class.active]="form.rol === 'SUPERVISOR'">
-                <input type="radio" [(ngModel)]="form.rol" name="rol" value="SUPERVISOR" />
-                <span class="material-icons-round">supervisor_account</span>
-                <div>
-                  <strong>Supervisor</strong>
-                  <small>Consulta todo, no modifica inventario ni usuarios</small>
-                </div>
-              </label>
               <label class="rol-option" [class.active]="form.rol === 'ADMIN'">
                 <input type="radio" [(ngModel)]="form.rol" name="rol" value="ADMIN" />
                 <span class="material-icons-round">admin_panel_settings</span>
