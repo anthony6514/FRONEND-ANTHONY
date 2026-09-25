@@ -3,7 +3,10 @@ import { Observable, of, catchError, map } from 'rxjs';
 import {
   Producto, Cliente, Proforma, Venta, Recibo, MovimientoInventario, DashboardStats
 } from '../models';
-import { ApiService, BackendProducto, BackendCliente, BackendProforma, BackendVenta, BackendRecibo, BackendMovimiento } from './api.service';
+import {
+  ApiService, BackendProducto, BackendStock, BackendCliente,
+  BackendProforma, BackendVenta, BackendRecibo, BackendMovimiento
+} from './api.service';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
@@ -12,48 +15,63 @@ export class DataService {
   // ─── PRODUCTOS (real + fallback mock) ─────────────────────────────────────
   getProductosHttp(): Observable<Producto[]> {
     return this.api.getProductos().pipe(
-      map(list => list.map(p => this.mapProducto(p))),
-      catchError(() => of(this.getProductos()))
+      map(list => list.map(p => this.mapProducto(p)))
     );
   }
 
   private mapProducto(p: BackendProducto): Producto {
     return {
-      id: p.idProducto,
-      codigo: p.codigo,
-      nombre: p.nombre,
-      descripcion: p.descripcion,
+      id:           p.id,
+      codigo:       p.codigo,
+      nombre:       p.nombre,
+      descripcion:  p.descripcion,
       presentacion: p.presentacion ?? '',
-      volumen: 1,
-      unidad: p.unidad,
-      precio: p.costoUnitario,
-      precioVenta: p.costoUnitario,
-      stock: p.stockActual ?? 0,
-      stockMinimo: 100,
-      estado: (p.estado ?? 'ACTIVO') as 'ACTIVO' | 'INACTIVO',
-      imagen: 'assets/products/repsol-generic.png',
+      volumen:      p.volumen ?? 1,
+      unidad:       p.unidad,
+      precio:       p.costoUnitario,
+      precioVenta:  p.costoUnitario,
+      stock:        0,
+      stockMinimo:  100,
+      estado:       (p.estado ?? 'ACTIVO') as 'ACTIVO' | 'INACTIVO',
+      imagen:       undefined,
     };
   }
 
-  // ─── INVENTARIO HTTP ──────────────────────────────────────────────────────
+  // ─── INVENTARIO HTTP (usa BackendStock con idProducto) ────────────────────
   getInventarioHttp(): Observable<Producto[]> {
     return this.api.getInventario().pipe(
-      map(list => list.map(p => this.mapProducto(p))),
-      catchError(() => of(this.getProductos()))
+      map(list => list.map(s => this.mapStock(s)))
     );
+  }
+
+  private mapStock(s: BackendStock): Producto {
+    return {
+      id:           s.idProducto,
+      codigo:       s.codigo,
+      nombre:       s.nombre,
+      descripcion:  undefined,
+      presentacion: s.presentacion ?? '',
+      volumen:      1,
+      unidad:       s.unidad,
+      precio:       s.costoUnitario,
+      precioVenta:  s.costoUnitario,
+      stock:        s.stockActual ?? 0,
+      stockMinimo:  100,
+      estado:       'ACTIVO',
+      imagen:       undefined,
+    };
   }
 
   // ─── CLIENTES HTTP ────────────────────────────────────────────────────────
   getClientesHttp(): Observable<Cliente[]> {
     return this.api.getClientes().pipe(
-      map(list => list.map(c => this.mapCliente(c))),
-      catchError(() => of(this.getClientes()))
+      map(list => list.map(c => this.mapCliente(c)))
     );
   }
 
   private mapCliente(c: BackendCliente): Cliente {
     return {
-      id: c.idCliente,
+      id:             c.id,
       ruc: c.identificacion,
       nombre: c.nombre,
       telefono: c.telefono,
@@ -68,36 +86,35 @@ export class DataService {
   // ─── PROFORMAS HTTP ───────────────────────────────────────────────────────
   getProformasHttp(): Observable<Proforma[]> {
     return this.api.getProformas().pipe(
-      map(list => list.map(p => this.mapProforma(p))),
-      catchError(() => of(this.getProformas()))
+      map(list => list.map(p => this.mapProforma(p)))
     );
   }
 
   private mapProforma(p: BackendProforma): Proforma {
     return {
-      id: p.idProforma,
-      numero: p.numero,
-      fecha: p.fecha?.split('T')[0] ?? '',
-      fechaVence: '',
-      clienteId: p.cliente.idCliente,
-      clienteNombre: p.cliente.nombre,
-      vendedor: p.vendedor.nombre,
-      moneda: 'PEN',
-      estado: p.estado as 'EMITIDA' | 'ANULADA',
-      subtotal: p.subtotal,
-      igv: 0,
-      total: p.total,
+      id:             p.id,
+      numero:         p.numero,
+      fecha:          p.fecha?.split('T')[0] ?? '',
+      fechaVence:     '',
+      clienteId:      p.clienteId,
+      clienteNombre:  `Cliente #${p.clienteId}`,
+      vendedor:       `Vendedor #${p.vendedorId}`,
+      moneda:         'PEN',
+      estado:         p.estado as 'EMITIDA' | 'ANULADA',
+      subtotal:       p.total,
+      igv:            0,
+      total:          p.total,
       detalles: (p.detalles ?? []).map(d => ({
-        id: d.idDetalle,
-        proformaId: p.idProforma,
-        productoId: d.producto.idProducto,
-        productoNombre: d.producto.nombre,
-        presentacion: '',
-        volumen: 1,
-        unidad: d.producto.unidad,
-        cantidad: d.cantidad,
+        id:             d.id,
+        proformaId:     p.id,
+        productoId:     d.productoId,
+        productoNombre: `Producto #${d.productoId}`,
+        presentacion:   '',
+        volumen:        1,
+        unidad:         '',
+        cantidad:       d.cantidad,
         precioUnitario: d.precioUnitario,
-        importe: d.subtotal,
+        importe:        d.subtotal,
       })),
     };
   }
@@ -105,52 +122,52 @@ export class DataService {
   // ─── VENTAS HTTP ──────────────────────────────────────────────────────────
   getVentasHttp(): Observable<Venta[]> {
     return this.api.getVentas().pipe(
-      map(list => list.map(v => this.mapVenta(v))),
-      catchError(() => of(this.getVentas()))
+      map(list => list.map(v => this.mapVenta(v)))
     );
   }
 
   private mapVenta(v: BackendVenta): Venta {
     const estadoMap: Record<string, 'PENDIENTE' | 'PAGADA' | 'ANULADA' | 'PARCIAL'> = {
-      PENDIENTE: 'PENDIENTE', PAGADA: 'PAGADA', ANULADA: 'ANULADA', PARCIAL: 'PARCIAL'
+      PENDIENTE:'PENDIENTE', PAGADA:'PAGADA', ANULADA:'ANULADA', PARCIAL:'PARCIAL'
     };
     return {
-      id: v.idVenta,
-      numero: v.numero,
-      fecha: v.fecha?.split('T')[0] ?? '',
-      clienteId: v.cliente.idCliente,
-      clienteNombre: v.cliente.nombre,
-      vendedor: v.vendedor.nombre,
-      moneda: 'PEN',
-      estado: estadoMap[v.estado] ?? 'PENDIENTE',
-      totalVenta: v.total,
-      totalAbonado: v.totalAbonado,
+      id:             v.id,
+      numero:         v.numero,
+      fecha:          v.fecha?.split('T')[0] ?? '',
+      clienteId:      v.clienteId,
+      clienteNombre:  `Cliente #${v.clienteId}`,
+      vendedor:       `Vendedor #${v.vendedorId}`,
+      proformaId:     v.proformaId,
+      proformaNro:    v.proformaId ? `PRO-${v.proformaId}` : undefined,
+      moneda:         'PEN',
+      estado:         estadoMap[v.estado] ?? 'PENDIENTE',
+      totalVenta:     v.total,
+      totalAbonado:   v.totalAbonado,
       saldoPendiente: v.saldo,
-      detalles: [],
+      detalles:       [],
     };
   }
 
   // ─── RECIBOS HTTP ─────────────────────────────────────────────────────────
   getRecibosHttp(): Observable<Recibo[]> {
     return this.api.getRecibos().pipe(
-      map(list => list.map(r => this.mapRecibo(r))),
-      catchError(() => of(this.getRecibos()))
+      map(list => list.map(r => this.mapRecibo(r)))
     );
   }
 
   private mapRecibo(r: BackendRecibo): Recibo {
     return {
-      id: r.idRecibo,
-      numero: r.numero,
-      fecha: r.fecha?.split('T')[0] ?? '',
-      proformaId: 0,
-      proformaNro: r.venta?.numero ?? '',
-      clienteNombre: '',
-      vendedor: '',
-      moneda: 'PEN',
-      monto: r.monto,
-      metodoPago: 'TRANSFERENCIA',
-      nroOperacion: undefined,
+      id:             r.id,
+      numero:         r.numero,
+      fecha:          r.fecha?.split('T')[0] ?? '',
+      proformaId:     0,
+      proformaNro:    `VEN-${r.ventaId}`,
+      clienteNombre:  '',
+      vendedor:       '',
+      moneda:         'PEN',
+      monto:          r.monto,
+      metodoPago:     'TRANSFERENCIA',
+      nroOperacion:   undefined,
       saldoPendiente: 0,
     };
   }
@@ -158,8 +175,7 @@ export class DataService {
   // ─── KARDEX HTTP ──────────────────────────────────────────────────────────
   getKardexHttp(productId: number): Observable<MovimientoInventario[]> {
     return this.api.getKardex(productId).pipe(
-      map(k => k.movimientos.map(m => this.mapMovimiento(m, productId))),
-      catchError(() => of(this.getMovimientos()))
+      map(k => k.movimientos.map(m => this.mapMovimiento(m, productId)))
     );
   }
 

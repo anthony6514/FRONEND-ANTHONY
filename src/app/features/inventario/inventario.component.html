@@ -5,15 +5,18 @@
       <p class="breadcrumb">Stock / Inventario</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn--outline" >
+      <button class="btn btn--primary" (click)="openNuevoProducto()">
+        <span class="material-icons-round">add</span> Nuevo producto
+      </button>
+      <button class="btn btn--outline" (click)="openRegistrarEntrada()">
+        <span class="material-icons-round">add_circle_outline</span> Registrar entrada
+      </button>
+      <button class="btn btn--outline">
         <span class="material-icons-round">download</span> Exportar Excel
       </button>
-      <a routerLink="/entradas" class="btn btn--outline">
-        <span class="material-icons-round">add_circle_outline</span> Registrar entrada
-      </a>
-      <a routerLink="/salidas" class="btn btn--primary">
-        <span class="material-icons-round">remove_circle_outline</span> Nueva salida
-      </a>
+      <button class="btn btn--outline">
+        <span class="material-icons-round">print</span> Imprimir
+      </button>
     </div>
   </div>
 
@@ -22,7 +25,7 @@
       <div class="stat-icon stat-icon--orange"><span class="material-icons-round">category</span></div>
       <div class="stat-body">
         <span class="stat-label">Total Productos</span>
-        <span class="stat-value">{{ productos.length }}</span>
+        <span class="stat-value">{{ productos().length }}</span>
         <span class="stat-change">unidades activas</span>
       </div>
     </div>
@@ -129,4 +132,70 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal Nuevo Producto -->
+  <div class="modal-backdrop" *ngIf="showProductoForm()" (click)="closeModals()">
+    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Nuevo Producto</h3>
+        <button class="icon-btn" (click)="closeModals()"><span class="material-icons-round">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-error" *ngIf="errorMsg">
+          <span class="material-icons-round">error_outline</span> {{ errorMsg }}
+        </div>
+        <div class="mock-form-grid">
+          <div class="fg"><label>Código</label><input [(ngModel)]="formProd.codigo" placeholder="REP-001" /></div>
+          <div class="fg"><label>Nombre</label><input [(ngModel)]="formProd.nombre" placeholder="REPSOL Gasolina 90" /></div>
+          <div class="fg"><label>Presentación</label><input [(ngModel)]="formProd.presentacion" placeholder="Cilindro 1x60L" /></div>
+          <div class="fg"><label>Volumen por envase</label><input type="number" [(ngModel)]="formProd.volumen" placeholder="60" /></div>
+          <div class="fg"><label>Unidad</label><input [(ngModel)]="formProd.unidad" placeholder="L" /></div>
+          <div class="fg"><label>Costo unitario (S/)</label><input type="number" [(ngModel)]="formProd.costoUnitario" placeholder="15.50" /></div>
+          <div class="fg" style="grid-column:span 2"><label>Descripción</label><input [(ngModel)]="formProd.descripcion" placeholder="Descripción del producto" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="closeModals()">Cancelar</button>
+        <button class="btn btn--primary" (click)="guardarProducto()" [disabled]="saving()">
+          <span class="material-icons-round">{{ saving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ saving() ? 'Guardando…' : 'Guardar producto' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registrar Entrada -->
+  <div class="modal-backdrop" *ngIf="showEntradaForm()" (click)="closeModals()">
+    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Registrar Entrada de Stock</h3>
+        <button class="icon-btn" (click)="closeModals()"><span class="material-icons-round">close</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert-error" *ngIf="errorMsg">
+          <span class="material-icons-round">error_outline</span> {{ errorMsg }}
+        </div>
+        <div class="mock-form-grid">
+          <div class="fg" style="grid-column:span 2">
+            <label>Producto</label>
+            <select [(ngModel)]="formEntrada.productoId">
+              <option value="">-- Seleccionar --</option>
+              <option *ngFor="let p of productos()" [value]="p.id">{{ p.nombre }}</option>
+            </select>
+          </div>
+          <div class="fg"><label>Cantidad</label><input type="number" [(ngModel)]="formEntrada.cantidad" placeholder="100" /></div>
+          <div class="fg"><label>N° Documento origen</label><input [(ngModel)]="formEntrada.documentoOrigen" placeholder="OC-2026-001" /></div>
+          <div class="fg" style="grid-column:span 2"><label>Observación</label><input [(ngModel)]="formEntrada.observacion" placeholder="Opcional" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="closeModals()">Cancelar</button>
+        <button class="btn btn--primary" (click)="guardarEntrada()" [disabled]="saving()">
+          <span class="material-icons-round">{{ saving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ saving() ? 'Registrando…' : 'Registrar entrada' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

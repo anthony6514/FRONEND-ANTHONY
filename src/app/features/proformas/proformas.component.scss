@@ -242,3 +242,126 @@
   .material-icons-round { font-size: .75rem; }
   .pdf-web { margin-left: auto; font-weight: 700; color: #FF5A00; }
 }
+
+// ── Layout de creación (formulario + preview) ──────────────────────────────
+.pf-create-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+.pf-form-col { display: flex; flex-direction: column; gap: 16px; }
+
+.pf-section {
+  padding: 20px;
+  .pf-section-title {
+    font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+    color: var(--text-secondary); text-transform: uppercase;
+    margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+}
+
+// ── Alerta de error ────────────────────────────────────────────────────────
+.alert-error {
+  display: flex; align-items: center; gap: 8px;
+  background: #fef2f2; border: 1px solid #fca5a5;
+  color: #dc2626; border-radius: var(--radius-sm);
+  padding: 10px 14px; font-size: .85rem; margin-bottom: 4px;
+  .material-icons-round { font-size: 1.1rem; }
+}
+
+// ── Búsqueda de cliente ────────────────────────────────────────────────────
+.cliente-dropdown {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); box-shadow: 0 6px 20px rgba(0,0,0,.12);
+  max-height: 220px; overflow-y: auto;
+}
+.cliente-option {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 14px; cursor: pointer; font-size: .85rem;
+  &:hover { background: var(--background); }
+  .co-nombre { font-weight: 600; color: var(--text-primary); }
+  .co-ruc    { font-size: .75rem; color: var(--text-secondary); }
+}
+
+.cliente-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--background); border: 1px solid var(--brand-orange);
+  border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 10px;
+  .material-icons-round { color: var(--brand-orange); font-size: 1.3rem; }
+  div { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  strong { font-size: .88rem; color: var(--text-primary); }
+  span   { font-size: .75rem; color: var(--text-secondary); }
+}
+
+// ── Tabla de detalle editable ──────────────────────────────────────────────
+.pf-detalle-table {
+  td { padding: 4px 6px; vertical-align: middle; }
+}
+.cell-input {
+  width: 100%; padding: 5px 7px; border: 1px solid var(--border);
+  border-radius: 4px; background: var(--background); color: var(--text-primary);
+  font-size: .8rem; font-family: inherit;
+  &:focus { outline: none; border-color: var(--brand-orange); }
+}
+.cell-num  { width: 80px; text-align: right; }
+.right     { text-align: right; }
+.empty-row { text-align: center; color: var(--text-secondary); font-size: .85rem; padding: 16px !important; }
+
+// ── Totales del formulario ─────────────────────────────────────────────────
+.pf-adicional-grid {
+  display: grid; grid-template-columns: 1fr 240px; gap: 24px;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+}
+.pf-adicional-left { display: flex; flex-direction: column; gap: 12px; }
+.pf-totales {
+  border-left: 1px solid var(--border); padding-left: 20px;
+  display: flex; flex-direction: column; gap: 10px; justify-content: center;
+}
+.total-row {
+  display: flex; justify-content: space-between;
+  font-size: .88rem; color: var(--text-secondary);
+}
+.total-final {
+  font-size: 1rem; font-weight: 700; color: var(--brand-orange);
+  border-top: 2px solid var(--brand-orange); padding-top: 10px; margin-top: 4px;
+}
+
+// ── Modales ────────────────────────────────────────────────────────────────
+.modal-card--lg { width: min(780px, 95vw); max-height: 88vh; overflow-y: auto; }
+.modal-card--sm { width: min(420px, 95vw); }
+
+.modal-body { padding: 20px 24px; }
+
+.modal-footer {
+  display: flex; gap: 8px; justify-content: flex-end;
+  padding: 14px 20px; border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+// ── Grid detalle ────────────────────────────────────────────────────────────
+.detalle-grid-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px;
+  background: var(--surface-2, rgba(255,255,255,.04));
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 16px;
+}
+
+.detalle-field {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.detalle-label {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  opacity: .5; font-weight: 600;
+}
+.detalle-value {
+  font-size: .9rem; font-weight: 500;
+}
+.detalle-value.mono { font-family: monospace; font-size: .85rem; }
+
+.right { text-align: right; }
+.totals-row td { background: var(--surface-2, rgba(255,255,255,.04)); }

@@ -1,7 +1,7 @@
 import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, of, tap, map } from 'rxjs';
 import { User } from '../models';
 import { ApiService } from './api.service';
 
@@ -23,8 +23,18 @@ export class AuthService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem('butcoint-user');
-      if (saved) this.currentUser.set(JSON.parse(saved));
+      const savedUser  = localStorage.getItem('butcoint-user');
+      const savedToken = localStorage.getItem('butcoint-token');
+      // Solo restaurar la sesión si hay TANTO usuario como token guardados.
+      // Si solo hay usuario pero no token (sesión mock o token borrado por 401),
+      // limpiamos el usuario para forzar un login real con credenciales.
+      if (savedUser && savedToken) {
+        this.currentUser.set(JSON.parse(savedUser));
+      } else {
+        // Limpiar estado inconsistente
+        localStorage.removeItem('butcoint-user');
+        localStorage.removeItem('butcoint-token');
+      }
     }
   }
 
@@ -32,17 +42,23 @@ export class AuthService {
   loginReal(email: string, password: string): Observable<boolean> {
     return this.api.login({ email, password }).pipe(
       tap(res => {
-        // Guardar token JWT
+        // Guardar JWT
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('butcoint-token', res.accessToken);
         }
-        // Mapear usuario del backend al modelo local
+        // res.usuario es el BackendUser que tiene roles: string[]
+        // Soportamos tanto el contrato nuevo { user } como el viejo { usuario }
+        const u = (res as any).user ?? res.usuario;
+        // Roles: puede ser array [ 'ROLE_ADMIN' ] o campo único rol: 'ADMIN'
+        const roles: string[] = Array.isArray(u.roles)
+          ? u.roles
+          : (u.rol ? [u.rol] : []);
         const user: User = {
-          id:     res.usuario.id,
-          nombre: res.usuario.nombre,
-          email:  res.usuario.email,
-          rol:    this.mapRol(res.usuario.roles),
-          estado: res.usuario.estado as 'ACTIVO' | 'INACTIVO',
+          id:     u.id,
+          nombre: u.nombre,
+          email:  u.email,
+          rol:    this.mapRol(roles),
+          estado: (u.estado ?? 'ACTIVO') as 'ACTIVO' | 'INACTIVO',
         };
         this.currentUser.set(user);
         if (isPlatformBrowser(this.platformId)) {
@@ -50,8 +66,8 @@ export class AuthService {
         }
         this.router.navigate(['/dashboard']);
       }),
-      // Si el backend falla → intentamos con mock
-      catchError(() => of(false as any))
+      map(() => true),
+      catchError(err => { throw err; })
     );
   }
 
@@ -87,8 +103,11 @@ export class AuthService {
   }
 
   private mapRol(roles: string[]): 'ADMIN' | 'SUPERVISOR' | 'VENDEDOR' {
-    if (roles.includes('ADMIN'))      return 'ADMIN';
-    if (roles.includes('SUPERVISOR')) return 'SUPERVISOR';
+    // Normaliza: elimina prefijo ROLE_ y convierte a mayúsculas
+    // Soporta ['ROLE_ADMIN'], ['ADMIN'], ['admin'], etc.
+    const normalized = roles.map(r => r.replace(/^ROLE_/i, '').toUpperCase());
+    if (normalized.includes('ADMIN'))      return 'ADMIN';
+    if (normalized.includes('SUPERVISOR')) return 'SUPERVISOR';
     return 'VENDEDOR';
   }
 }

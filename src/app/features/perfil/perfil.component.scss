@@ -1,0 +1,100 @@
+.perfil { max-width: 900px; }
+
+.perfil-layout {
+  display: flex; gap: 20px; align-items: flex-start;
+  @media (max-width: 768px) { flex-direction: column; }
+}
+
+// ─── Tarjeta principal ────────────────────────────────────────────────────────
+.perfil-card { flex: 1; padding: 28px; }
+
+.avatar-section {
+  display: flex; align-items: center; gap: 20px;
+  padding-bottom: 24px; border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.big-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--brand-orange); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; font-weight: 700; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255,90,0,.35);
+}
+.avatar-info {
+  h2 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .user-email { font-size: .85rem; color: var(--text-secondary); margin-bottom: 8px; }
+  .badge { display: inline-flex; align-items: center; gap: 4px;
+    .material-icons-round { font-size: .85rem; }
+  }
+}
+
+.info-grid { display: flex; flex-direction: column; gap: 16px; }
+.info-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  &:last-child { border-bottom: none; }
+}
+.info-label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; font-weight: 500; color: var(--text-secondary);
+  .material-icons-round { font-size: 1rem; color: var(--brand-orange); }
+}
+.info-value { font-size: .9rem; font-weight: 600; color: var(--text-primary); }
+
+// ─── Panel lateral ────────────────────────────────────────────────────────────
+.perfil-actions { width: 300px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
+
+.action-card { padding: 0; overflow: hidden; }
+.action-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; transition: background var(--transition);
+  &:hover { background: var(--brand-orange-soft); }
+}
+.action-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .9rem; font-weight: 600; color: var(--text-primary);
+  .material-icons-round { color: var(--brand-orange); font-size: 1.1rem; }
+}
+.toggle-arrow { color: var(--text-secondary); font-size: 1.1rem !important; }
+
+// ─── Formulario contraseña ────────────────────────────────────────────────────
+.pass-form { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 14px; }
+.fg {
+  display: flex; flex-direction: column; gap: 4px;
+  label { font-size: .75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;
+    small { text-transform: none; font-weight: 400; margin-left: 4px; }
+  }
+}
+.input-wrap {
+  display: flex; align-items: center;
+  background: var(--background); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 0 12px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  &:focus-within { border-color: var(--brand-orange); box-shadow: 0 0 0 3px rgba(255,90,0,.12); }
+  &.mismatch { border-color: var(--danger); }
+  .material-icons-round { font-size: 1rem; color: var(--text-secondary); flex-shrink: 0; }
+  input { flex:1; border:none; outline:none; background:transparent; padding:10px; font-size:.85rem; color:var(--text-primary); font-family:inherit; &::placeholder { color:var(--text-secondary); } }
+}
+.pass-toggle { background:none; border:none; cursor:pointer; padding:0; color:var(--text-secondary); display:flex; align-items:center; .material-icons-round { font-size:1rem; } &:hover { color:var(--brand-orange); } }
+
+.pass-strength { display:flex; align-items:center; gap:8px; margin-top:5px; }
+.strength-bar {
+  flex:1; height:4px; border-radius:99px; background:var(--border); transition:all .3s;
+  &.weak   { background:var(--danger);  }
+  &.medium { background:var(--warning); }
+  &.strong { background:var(--success); }
+}
+.strength-label { font-size:.72rem; font-weight:600; color:var(--text-secondary); }
+
+.match-hint { font-size:.75rem; color:var(--danger); margin-top:2px; }
+
+.form-footer { display:flex; justify-content:flex-end; gap:8px; padding-top:8px; }
+.form-error { display:flex; align-items:center; gap:8px; background:var(--danger-soft); border:1px solid var(--danger); border-radius:var(--radius-sm); padding:10px 12px; font-size:.82rem; color:var(--danger); .material-icons-round { font-size:1rem; } }
+.alert-success { display:flex; align-items:center; gap:8px; background:var(--success-soft); border:1px solid var(--success); border-radius:0; padding:12px 20px; font-size:.85rem; color:var(--success); .material-icons-round { font-size:1rem; } }
+
+// ─── Logout card ──────────────────────────────────────────────────────────────
+.logout-card { padding: 20px; }
+.logout-hint { font-size:.82rem; color:var(--text-secondary); margin:8px 0 14px; }
+.btn--danger { background:var(--danger); color:#fff; display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border:none; border-radius:var(--radius-sm); font-size:.88rem; font-weight:600; cursor:pointer; transition:all var(--transition); font-family:inherit; width:100%; justify-content:center; &:hover { background:#dc2626; transform:translateY(-1px); } .material-icons-round { font-size:1rem; } }
+
+.spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:inline-block; }

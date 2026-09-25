@@ -1,0 +1,230 @@
+<div class="usuarios animate-fade">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Usuarios</h1>
+      <p class="breadcrumb">Inicio / Usuarios &nbsp;·&nbsp;
+        <span class="admin-badge">
+          <span class="material-icons-round">admin_panel_settings</span>
+          Solo Administrador
+        </span>
+      </p>
+    </div>
+    <button class="btn btn--primary" (click)="openNew()">
+      <span class="material-icons-round">person_add</span>
+      Nueva cuenta
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">group</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Total usuarios</span>
+        <span class="stat-value">{{ users.length }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--danger"><span class="material-icons-round">admin_panel_settings</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Administradores</span>
+        <span class="stat-value">{{ totalAdmins }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info"><span class="material-icons-round">badge</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Vendedores</span>
+        <span class="stat-value">{{ totalVendedores }}</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success"><span class="material-icons-round">check_circle</span></div>
+      <div class="stat-body">
+        <span class="stat-label">Cuentas activas</span>
+        <span class="stat-value">{{ totalActivos }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  <div class="alert-success" *ngIf="success()">
+    <span class="material-icons-round">check_circle</span>
+    {{ success() }}
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-row" *ngIf="loading()">
+    <span class="material-icons-round spin">autorenew</span> Cargando usuarios...
+  </div>
+
+  <!-- Tabla -->
+  <div class="card table-card" *ngIf="!loading()">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td class="mono">#{{ u.id }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="u-avatar">{{ u.nombre.charAt(0) }}</div>
+                <span>{{ u.nombre }}</span>
+              </div>
+            </td>
+            <td class="email-cell">{{ u.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="rolBadge(u.roles)">
+                {{ rolLabel(u.roles) }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="u.estado === 'ACTIVO' ? 'badge--success' : 'badge--neutral'">
+                {{ u.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="actions">
+                <!-- Activar / Desactivar -->
+                <button
+                  class="icon-btn"
+                  [title]="u.estado === 'ACTIVO' ? 'Desactivar cuenta' : 'Activar cuenta'"
+                  (click)="toggleEstado(u)">
+                  <span class="material-icons-round">
+                    {{ u.estado === 'ACTIVO' ? 'person_off' : 'person' }}
+                  </span>
+                </button>
+                <!-- No permitir editar la cuenta propia del admin logueado -->
+                <button class="icon-btn" title="Resetear contraseña" [disabled]="u.id === auth.currentUser()?.id">
+                  <span class="material-icons-round">lock_reset</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL NUEVA CUENTA ═══ -->
+  <div class="modal-backdrop" *ngIf="showForm()" (click)="close()">
+    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="material-icons-round">person_add</span>
+          <h3>Crear nueva cuenta</h3>
+        </div>
+        <button class="icon-btn" (click)="close()">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Error -->
+        <div class="form-error" *ngIf="error()">
+          <span class="material-icons-round">error_outline</span>
+          {{ error() }}
+        </div>
+
+        <!-- Aviso rol -->
+        <div class="rol-aviso">
+          <span class="material-icons-round">info</span>
+          La cuenta se guardará en la base de datos. El usuario podrá iniciar sesión
+          inmediatamente con el email y contraseña que definas.
+        </div>
+
+        <div class="form-grid">
+          <!-- Nombre -->
+          <div class="fg full">
+            <label>Nombre completo</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">person</span>
+              <input [(ngModel)]="form.nombre" name="nombre"
+                     placeholder="Ej: Jaime Ríos" />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="fg full">
+            <label>Correo electrónico</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">email</span>
+              <input type="email" [(ngModel)]="form.email" name="email"
+                     placeholder="usuario@butcoint.com" />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="fg full">
+            <label>Contraseña <small>(mínimo 12 caracteres)</small></label>
+            <div class="input-wrap">
+              <span class="material-icons-round">lock</span>
+              <input [type]="showPass ? 'text' : 'password'"
+                     [(ngModel)]="form.password" name="password"
+                     placeholder="••••••••••••" />
+              <button type="button" class="pass-toggle" (click)="showPass = !showPass">
+                <span class="material-icons-round">{{ showPass ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Rol -->
+          <div class="fg full">
+            <label>Rol del usuario</label>
+            <div class="rol-selector">
+              <label class="rol-option" [class.active]="form.rol === 'VENDEDOR'">
+                <input type="radio" [(ngModel)]="form.rol" name="rol" value="VENDEDOR" />
+                <span class="material-icons-round">badge</span>
+                <div>
+                  <strong>Vendedor</strong>
+                  <small>Crea proformas, ventas y recibos de sus clientes</small>
+                </div>
+              </label>
+              <label class="rol-option" [class.active]="form.rol === 'SUPERVISOR'">
+                <input type="radio" [(ngModel)]="form.rol" name="rol" value="SUPERVISOR" />
+                <span class="material-icons-round">supervisor_account</span>
+                <div>
+                  <strong>Supervisor</strong>
+                  <small>Consulta todo, no modifica inventario ni usuarios</small>
+                </div>
+              </label>
+              <label class="rol-option" [class.active]="form.rol === 'ADMIN'">
+                <input type="radio" [(ngModel)]="form.rol" name="rol" value="ADMIN" />
+                <span class="material-icons-round">admin_panel_settings</span>
+                <div>
+                  <strong>Administrador</strong>
+                  <small>Acceso completo al sistema</small>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary" (click)="save()" [disabled]="saving()">
+          <span *ngIf="!saving()">
+            <span class="material-icons-round">save</span> Crear cuenta
+          </span>
+          <span *ngIf="saving()" class="spinner"></span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

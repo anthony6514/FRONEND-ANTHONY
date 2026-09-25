@@ -1,30 +1,31 @@
 <header class="topbar">
-  <!-- Left: breadcrumb slot -->
+  <!-- Left: logo REPSOL -->
   <div class="topbar__left">
     <div class="repsol-badge">
-      <img src="assets/logo-inventio.png" alt="INVENTIO" class="repsol-logo" />
+      <img src="/logo-inventio.png" alt="INVENTIO" class="repsol-logo" />
     </div>
   </div>
 
   <!-- Right: actions -->
   <div class="topbar__right">
-    <!-- Sound toggle -->
+
+    <!-- Sonido -->
     <button class="action-btn" (click)="toggleSound()" [title]="sound.isEnabled() ? 'Silenciar' : 'Activar sonido'">
       <span class="material-icons-round">{{ sound.isEnabled() ? 'volume_up' : 'volume_off' }}</span>
     </button>
 
-    <!-- Theme toggle -->
+    <!-- Tema -->
     <button class="action-btn" (click)="toggleTheme()" [title]="theme.isDark() ? 'Modo claro' : 'Modo oscuro'">
       <span class="material-icons-round">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
     </button>
 
-    <!-- Notifications -->
+    <!-- Notificaciones -->
     <button class="action-btn notif-btn">
       <span class="material-icons-round">notifications</span>
       <span class="notif-dot"></span>
     </button>
 
-    <!-- User menu -->
+    <!-- Avatar / menú usuario -->
     <div class="user-chip" (click)="showUserMenu = !showUserMenu" *ngIf="auth.currentUser() as user">
       <div class="chip-avatar">{{ user.nombre.charAt(0) }}</div>
       <div class="chip-info">
@@ -34,13 +35,37 @@
       <span class="material-icons-round chip-arrow">{{ showUserMenu ? 'expand_less' : 'expand_more' }}</span>
 
       <!-- Dropdown -->
-      <div class="user-dropdown" *ngIf="showUserMenu">
-        <a [routerLink]="['/usuarios']" class="dropdown-item">
-          <span class="material-icons-round">manage_accounts</span> Mi perfil
-        </a>
+      <div class="user-dropdown" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
+
+        <!-- Cabecera del dropdown -->
+        <div class="dropdown-user-header">
+          <div class="dropdown-avatar">{{ user.nombre.charAt(0) }}</div>
+          <div>
+            <span class="dropdown-name">{{ user.nombre }}</span>
+            <span class="dropdown-email">{{ user.email }}</span>
+          </div>
+        </div>
+
         <div class="dropdown-divider"></div>
+
+        <!-- Mi perfil -->
+        <a [routerLink]="['/perfil']" class="dropdown-item" (click)="showUserMenu = false">
+          <span class="material-icons-round">account_circle</span>
+          Mi perfil
+        </a>
+
+        <!-- Gestión usuarios (solo ADMIN) -->
+        <a *ngIf="auth.isAdmin()" [routerLink]="['/usuarios']" class="dropdown-item" (click)="showUserMenu = false">
+          <span class="material-icons-round">manage_accounts</span>
+          Gestión de usuarios
+        </a>
+
+        <div class="dropdown-divider"></div>
+
+        <!-- Cerrar sesión -->
         <button class="dropdown-item danger" (click)="logout()">
-          <span class="material-icons-round">logout</span> Cerrar sesión
+          <span class="material-icons-round">logout</span>
+          Cerrar sesión
         </button>
       </div>
     </div>

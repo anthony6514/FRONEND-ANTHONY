@@ -155,3 +155,17 @@
   height: 1px;
   background: var(--border);
 }
+
+// ─── Dropdown header ──────────────────────────────────────────────────────────
+.dropdown-user-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+}
+.dropdown-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--brand-orange); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .88rem; font-weight: 700; flex-shrink: 0;
+}
+.dropdown-name  { display: block; font-size: .88rem; font-weight: 600; color: var(--text-primary); }
+.dropdown-email { display: block; font-size: .75rem; color: var(--text-secondary); }

@@ -18,7 +18,8 @@ export class ClientesComponent implements OnInit {
   api   = inject(ApiService);
   sound = inject(SoundService);
 
-  clientes: Cliente[] = [];
+  // Signal en lugar de array normal — computed() puede rastrearlo
+  clientes    = signal<Cliente[]>([]);
   loading     = signal(true);
   search      = signal('');
   showForm    = signal(false);
@@ -28,27 +29,34 @@ export class ClientesComponent implements OnInit {
   form = { nombre:'', ruc:'', telefono:'', ciudad:'', vendedor:'' };
 
   ngOnInit() {
-    this.ds.getClientesHttp().subscribe(data => {
-      this.clientes = data;
-      this.loading.set(false);
+    this.cargar();
+  }
+
+  cargar() {
+    this.loading.set(true);
+    this.ds.getClientesHttp().subscribe({
+      next: data => { this.clientes.set(data); this.loading.set(false); },
+      error: ()   => { this.loading.set(false); }
     });
   }
 
+  // computed() detecta cambios porque clientes es un signal
   filtered = computed(() => {
-    const q = this.search().toLowerCase();
+    const q    = this.search().toLowerCase();
+    const list = this.clientes();
     return q
-      ? this.clientes.filter(c =>
+      ? list.filter(c =>
           c.nombre.toLowerCase().includes(q) ||
-          c.ruc.includes(q) ||
+          (c.ruc ?? '').toLowerCase().includes(q) ||
           (c.ciudad ?? '').toLowerCase().includes(q)
         )
-      : this.clientes;
+      : list;
   });
 
-  get totalClientes()   { return this.clientes.length; }
-  get clientesActivos() { return this.clientes.filter(c => c.estado === 'ACTIVO').length; }
-  get conSaldo()        { return this.clientes.filter(c => c.saldoPendiente > 0).length; }
-  get totalSaldo()      { return this.clientes.reduce((s, c) => s + c.saldoPendiente, 0); }
+  get totalClientes()   { return this.clientes().length; }
+  get clientesActivos() { return this.clientes().filter(c => c.estado === 'ACTIVO').length; }
+  get conSaldo()        { return this.clientes().filter(c => c.saldoPendiente > 0).length; }
+  get totalSaldo()      { return this.clientes().reduce((s, c) => s + c.saldoPendiente, 0); }
 
   openNew() {
     this.editCliente.set(null);
@@ -59,7 +67,7 @@ export class ClientesComponent implements OnInit {
 
   openEdit(c: Cliente) {
     this.editCliente.set(c);
-    this.form = { nombre:c.nombre, ruc:c.ruc, telefono:c.telefono??'', ciudad:c.ciudad??'', vendedor:c.vendedor??'' };
+    this.form = { nombre:c.nombre, ruc:c.ruc ?? '', telefono:c.telefono??'', ciudad:c.ciudad??'', vendedor:c.vendedor??'' };
     this.showForm.set(true);
     this.sound.play('click');
   }
@@ -75,21 +83,25 @@ export class ClientesComponent implements OnInit {
 
     req.subscribe({
       next: () => {
-        // Recargar lista
         this.ds.getClientesHttp().subscribe(data => {
-          this.clientes = data;
+          this.clientes.set(data);
           this.saving.set(false);
           this.showForm.set(false);
           this.sound.play('success');
         });
       },
       error: () => {
-        // Fallback: actualizar localmente
+        // Fallback local
+        const current = this.clientes();
         if (edit) {
-          const idx = this.clientes.findIndex(c => c.id === edit.id);
-          if (idx >= 0) Object.assign(this.clientes[idx], { nombre: this.form.nombre, ruc: this.form.ruc, telefono: this.form.telefono, ciudad: this.form.ciudad });
+          const updated = current.map(c =>
+            c.id === edit.id
+              ? { ...c, nombre: this.form.nombre, ruc: this.form.ruc, telefono: this.form.telefono, ciudad: this.form.ciudad }
+              : c
+          );
+          this.clientes.set(updated);
         } else {
-          this.clientes.push({ id: Date.now(), ...this.form, totalCompras:0, saldoPendiente:0, estado:'ACTIVO' });
+          this.clientes.set([...current, { id: Date.now(), ...this.form, totalCompras:0, saldoPendiente:0, estado:'ACTIVO' }]);
         }
         this.saving.set(false);
         this.showForm.set(false);

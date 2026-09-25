@@ -1,0 +1,158 @@
+<div class="perfil animate-fade" *ngIf="user">
+
+  <div class="page-header">
+    <div>
+      <h1>Mi Perfil</h1>
+      <p class="breadcrumb">Inicio / Mi perfil</p>
+    </div>
+  </div>
+
+  <div class="perfil-layout">
+
+    <!-- ── Tarjeta principal ── -->
+    <div class="card perfil-card">
+      <div class="avatar-section">
+        <div class="big-avatar">{{ user.nombre.charAt(0) }}</div>
+        <div class="avatar-info">
+          <h2>{{ user.nombre }}</h2>
+          <p class="user-email">{{ user.email }}</p>
+          <span class="badge" [ngClass]="rolClass">
+            <span class="material-icons-round">{{ rolIcon }}</span>
+            {{ rolLabel }}
+          </span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">
+            <span class="material-icons-round">person</span> Nombre completo
+          </span>
+          <span class="info-value">{{ user.nombre }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">
+            <span class="material-icons-round">email</span> Correo electrónico
+          </span>
+          <span class="info-value">{{ user.email }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">
+            <span class="material-icons-round">shield</span> Rol en el sistema
+          </span>
+          <span class="info-value">{{ rolLabel }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">
+            <span class="material-icons-round">verified</span> Estado
+          </span>
+          <span class="badge badge--success">{{ user.estado }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel lateral ── -->
+    <div class="perfil-actions">
+
+      <!-- Cambiar contraseña -->
+      <div class="card action-card">
+        <div class="action-header" (click)="showPassForm.set(!showPassForm())">
+          <div class="action-title">
+            <span class="material-icons-round">lock_reset</span>
+            <span>Cambiar contraseña</span>
+          </div>
+          <span class="material-icons-round toggle-arrow">
+            {{ showPassForm() ? 'expand_less' : 'expand_more' }}
+          </span>
+        </div>
+
+        <!-- Éxito -->
+        <div class="alert-success" *ngIf="passSuccess()">
+          <span class="material-icons-round">check_circle</span>
+          {{ passSuccess() }}
+        </div>
+
+        <!-- Formulario -->
+        <div class="pass-form" *ngIf="showPassForm()">
+          <div class="form-error" *ngIf="passError()">
+            <span class="material-icons-round">error_outline</span>
+            {{ passError() }}
+          </div>
+
+          <div class="fg">
+            <label>Contraseña actual</label>
+            <div class="input-wrap">
+              <span class="material-icons-round">lock</span>
+              <input [type]="showOldPass ? 'text' : 'password'"
+                     [(ngModel)]="passForm.actual" placeholder="••••••••" />
+              <button type="button" class="pass-toggle" (click)="showOldPass = !showOldPass">
+                <span class="material-icons-round">{{ showOldPass ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Nueva contraseña <small>(mín. 12 caracteres)</small></label>
+            <div class="input-wrap">
+              <span class="material-icons-round">lock_open</span>
+              <input [type]="showNewPass ? 'text' : 'password'"
+                     [(ngModel)]="passForm.nueva" placeholder="••••••••••••" />
+              <button type="button" class="pass-toggle" (click)="showNewPass = !showNewPass">
+                <span class="material-icons-round">{{ showNewPass ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <!-- Barra de seguridad -->
+            <div class="pass-strength">
+              <div class="strength-bar" [ngClass]="{
+                'weak':   passForm.nueva.length > 0  && passForm.nueva.length < 8,
+                'medium': passForm.nueva.length >= 8  && passForm.nueva.length < 12,
+                'strong': passForm.nueva.length >= 12
+              }"></div>
+              <span class="strength-label" *ngIf="passForm.nueva.length > 0">
+                {{ passForm.nueva.length < 8 ? 'Débil' : passForm.nueva.length < 12 ? 'Media' : 'Fuerte' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Confirmar nueva contraseña</label>
+            <div class="input-wrap" [class.mismatch]="passForm.confirmar && passForm.nueva !== passForm.confirmar">
+              <span class="material-icons-round">lock_open</span>
+              <input [type]="showConfirm ? 'text' : 'password'"
+                     [(ngModel)]="passForm.confirmar" placeholder="••••••••••••" />
+              <button type="button" class="pass-toggle" (click)="showConfirm = !showConfirm">
+                <span class="material-icons-round">{{ showConfirm ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            <span class="match-hint" *ngIf="passForm.confirmar && passForm.nueva !== passForm.confirmar">
+              Las contraseñas no coinciden
+            </span>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn btn--outline" (click)="showPassForm.set(false)">Cancelar</button>
+            <button class="btn btn--primary" (click)="cambiarPassword()" [disabled]="savingPass()">
+              <span *ngIf="!savingPass()">
+                <span class="material-icons-round">save</span> Guardar
+              </span>
+              <span *ngIf="savingPass()" class="spinner"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cerrar sesión -->
+      <div class="card action-card logout-card">
+        <div class="action-title">
+          <span class="material-icons-round">logout</span>
+          <span>Sesión activa</span>
+        </div>
+        <p class="logout-hint">Al cerrar sesión deberás ingresar tus credenciales nuevamente.</p>
+        <button class="btn btn--danger" (click)="logout()">
+          <span class="material-icons-round">logout</span> Cerrar sesión
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

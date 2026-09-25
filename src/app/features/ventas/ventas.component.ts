@@ -16,33 +16,38 @@ export class VentasComponent implements OnInit {
   ds    = inject(DataService);
   sound = inject(SoundService);
 
-  ventas:  Venta[] = [];
-  loading  = signal(true);
-  search   = signal('');
+  // Signal para que computed() detecte cambios
+  ventas  = signal<Venta[]>([]);
+  loading = signal(true);
+  search  = signal('');
 
   ngOnInit() {
-    this.ds.getVentasHttp().subscribe(data => {
-      this.ventas = data;
-      this.loading.set(false);
+    this.ds.getVentasHttp().subscribe({
+      next: data => { this.ventas.set(data); this.loading.set(false); },
+      error: ()   => { this.loading.set(false); }
     });
   }
 
   filtered = computed(() => {
-    const q = this.search().toLowerCase();
-    return q ? this.ventas.filter(v =>
+    const q    = this.search().toLowerCase();
+    const list = this.ventas();
+    return q ? list.filter(v =>
       v.numero.toLowerCase().includes(q) ||
       v.clienteNombre.toLowerCase().includes(q) ||
       v.vendedor.toLowerCase().includes(q)
-    ) : this.ventas;
+    ) : list;
   });
 
-  get totalVentas() { return this.ventas.length; }
-  get montoTotal()  { return this.ventas.reduce((s, v) => s + v.totalVenta, 0); }
-  get saldoTotal()  { return this.ventas.reduce((s, v) => s + v.saldoPendiente, 0); }
-  get cobrado()     { return this.ventas.reduce((s, v) => s + v.totalAbonado, 0); }
+  get totalVentas() { return this.ventas().length; }
+  get montoTotal()  { return this.ventas().reduce((s, v) => s + v.totalVenta, 0); }
+  get saldoTotal()  { return this.ventas().reduce((s, v) => s + v.saldoPendiente, 0); }
+  get cobrado()     { return this.ventas().reduce((s, v) => s + v.totalAbonado, 0); }
 
   estadoBadge(e: string) {
-    const m: Record<string,string> = { PENDIENTE:'badge--warning', PAGADA:'badge--success', ANULADA:'badge--danger', PARCIAL:'badge--info' };
+    const m: Record<string, string> = {
+      PENDIENTE: 'badge--warning', PAGADA: 'badge--success',
+      ANULADA:   'badge--danger',  PARCIAL: 'badge--info'
+    };
     return m[e] ?? 'badge--neutral';
   }
 }

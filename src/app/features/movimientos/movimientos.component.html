@@ -139,8 +139,8 @@
           <div class="fg fg-wide">
             <label>Producto</label>
             <select [(ngModel)]="formEntrada.productoId" name="prod">
-              <option [value]="0">— Seleccionar producto —</option>
-              <option *ngFor="let p of productos" [value]="p.id">
+              <option [ngValue]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos()" [ngValue]="p.id">
                 {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
               </option>
             </select>
@@ -172,7 +172,7 @@
 
       <div class="card resumen-card" *ngIf="formEntrada.productoId > 0">
         <div class="form-section-title">RESUMEN</div>
-        <div class="resumen-row"><span>Producto</span><strong>{{ productos.find(p => p.id === +formEntrada.productoId)?.nombre }}</strong></div>
+        <div class="resumen-row"><span>Producto</span><strong>{{ productos().find(p => p.id === +formEntrada.productoId)?.nombre }}</strong></div>
         <div class="resumen-row"><span>Cantidad</span><strong>{{ formEntrada.cantidad | number:'1.0-0' }}</strong></div>
         <div class="resumen-row"><span>Costo unitario</span><strong>S/ {{ costoEntrada | number:'1.2-2' }}</strong></div>
         <div class="resumen-row resumen-total">
@@ -207,8 +207,8 @@
           <div class="fg fg-wide">
             <label>Producto</label>
             <select [(ngModel)]="formSalida.productoId" name="prod">
-              <option [value]="0">— Seleccionar producto —</option>
-              <option *ngFor="let p of productos" [value]="p.id">
+              <option [ngValue]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos()" [ngValue]="p.id">
                 {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
               </option>
             </select>
@@ -278,8 +278,8 @@
           <div class="fg fg-wide">
             <label>Producto</label>
             <select [(ngModel)]="formAjuste.productoId" name="prod">
-              <option [value]="0">— Seleccionar producto —</option>
-              <option *ngFor="let p of productos" [value]="p.id">
+              <option [ngValue]="0">— Seleccionar producto —</option>
+              <option *ngFor="let p of productos()" [ngValue]="p.id">
                 {{ p.codigo }} — {{ p.nombre }} (Stock: {{ p.stock }})
               </option>
             </select>

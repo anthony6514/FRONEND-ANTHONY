@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
+import { filter, Subscription } from 'rxjs';
 import { trigger, transition, style, animate, query } from '@angular/animations';
 
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
@@ -46,17 +46,34 @@ export const routeAnimations = trigger('routeAnimations', [
     .app-content{ flex: 1; padding: 24px; }
   `]
 })
-export class App {
+export class App implements OnInit, OnDestroy {
   auth    = inject(AuthService);
   router  = inject(Router);
   sidebarCollapsed = false;
 
-  showShell() {
-    const url = this.router.url;
-    return this.auth.isLoggedIn() && !url.startsWith('/login');
+  // Signal que rastrea la URL actual — se actualiza FUERA del ciclo de detección
+  // de cambios (vía NavigationEnd) para evitar ExpressionChangedAfterItHasBeenCheckedError
+  private currentUrl = signal(this.router.url);
+  private routerSub!: Subscription;
+
+  ngOnInit() {
+    this.routerSub = this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe(e => {
+      this.currentUrl.set((e as NavigationEnd).urlAfterRedirects);
+    });
   }
 
+  ngOnDestroy() {
+    this.routerSub?.unsubscribe();
+  }
+
+  // computed() permite que Angular rastree el signal de forma reactiva y segura
+  showShell = computed(() =>
+    this.auth.isLoggedIn() && !this.currentUrl().startsWith('/login')
+  );
+
   getRouteState(outlet: any) {
-    return outlet?.activatedRouteData?.['animation'] ?? Math.random();
+    return outlet?.activatedRouteData?.['animation'] ?? 'default';
   }
 }

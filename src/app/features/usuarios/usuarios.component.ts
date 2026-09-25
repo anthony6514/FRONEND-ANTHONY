@@ -1,80 +1,143 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { User } from '../../core/models';
+import { ApiService, BackendUser } from '../../core/services/api.service';
+import { SoundService } from '../../core/services/sound.service';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-<div class="usuarios animate-fade">
-  <div class="page-header">
-    <div><h1>Usuarios del sistema</h1><p class="breadcrumb">Inicio / Usuarios</p></div>
-    <button class="btn btn--primary" (click)="showNew.set(true)">
-      <span class="material-icons-round">person_add</span> Nuevo usuario
-    </button>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">manage_accounts</span></div>
-      <div class="stat-body"><span class="stat-label">Total usuarios</span><span class="stat-value">{{ users.length }}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--success"><span class="material-icons-round">admin_panel_settings</span></div>
-      <div class="stat-body"><span class="stat-label">Administradores</span><span class="stat-value">{{ admins }}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--info"><span class="material-icons-round">badge</span></div>
-      <div class="stat-body"><span class="stat-label">Vendedores</span><span class="stat-value">{{ vendedores }}</span></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead><tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let u of users">
-            <td class="mono">#{{ u.id }}</td>
-            <td>
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="width:30px;height:30px;border-radius:50%;background:var(--brand-orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700">{{ u.nombre.charAt(0) }}</div>
-                {{ u.nombre }}
-              </div>
-            </td>
-            <td>{{ u.email }}</td>
-            <td>
-              <span class="badge"
-                [ngClass]="u.rol==='ADMIN'?'badge--danger':'badge--info'">
-                {{ u.rol }}
-              </span>
-            </td>
-            <td><span class="badge" [ngClass]="u.estado==='ACTIVO'?'badge--success':'badge--neutral'">{{ u.estado }}</span></td>
-            <td>
-              <div style="display:flex;gap:4px">
-                <button class="icon-btn"><span class="material-icons-round" style="font-size:.9rem">edit</span></button>
-                <button class="icon-btn"><span class="material-icons-round" style="font-size:.9rem">lock_reset</span></button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>`,
-  styles: [`.usuarios{max-width:900px}.table-wrap{overflow-x:auto}.mono{font-family:monospace;font-size:.82rem}.icon-btn{background:none;border:none;cursor:pointer;padding:4px;border-radius:5px;color:var(--text-secondary);transition:all var(--transition);&:hover{background:var(--brand-orange-soft);color:var(--brand-orange)}}`]
+  templateUrl: './usuarios.component.html',
+  styleUrl: './usuarios.component.scss',
 })
-export class UsuariosComponent {
-  auth     = inject(AuthService);
-  showNew  = signal(false);
-  users: User[] = [
-    { id:1, nombre:'Chris Butrón',  email:'admin@inventio.pe',     rol:'ADMIN',    estado:'ACTIVO' },
-    { id:2, nombre:'Vendedor 1',    email:'vendedor1@inventio.pe',  rol:'VENDEDOR', estado:'ACTIVO' },
-    { id:3, nombre:'Vendedor 2',    email:'vendedor2@inventio.pe',  rol:'VENDEDOR', estado:'ACTIVO' },
-  ];
-  get admins()    { return this.users.filter(u => u.rol === 'ADMIN').length; }
-  get vendedores(){ return this.users.filter(u => u.rol === 'VENDEDOR').length; }
+export class UsuariosComponent implements OnInit {
+  auth   = inject(AuthService);
+  api    = inject(ApiService);
+  sound  = inject(SoundService);
+  router = inject(Router);
+
+  users   : BackendUser[] = [];
+  loading  = signal(true);
+  saving   = signal(false);
+  showForm = signal(false);
+  error    = signal('');
+  success  = signal('');
+
+  // Form nueva cuenta
+  form = {
+    nombre:   '',
+    email:    '',
+    password: '',
+    rol:      'VENDEDOR' as 'ADMIN' | 'SUPERVISOR' | 'VENDEDOR',
+  };
+  showPass = false;
+
+  ngOnInit() {
+    // Bloqueo extra en frontend: si no es admin, fuera
+    if (!this.auth.isAdmin()) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+    this.loadUsers();
+  }
+
+  loadUsers() {
+    this.loading.set(true);
+    this.api.getUsuarios().subscribe({
+      next: (data) => {
+        this.users = data;
+        this.loading.set(false);
+      },
+      error: () => {
+        // fallback a datos del usuario actual si el backend no responde
+        const me = this.auth.currentUser();
+        if (me) {
+          this.users = [{
+            id: me.id, nombre: me.nombre, email: me.email,
+            roles: [me.rol], estado: me.estado
+          }];
+        }
+        this.loading.set(false);
+      }
+    });
+  }
+
+  openNew() {
+    this.form = { nombre:'', email:'', password:'', rol:'VENDEDOR' };
+    this.error.set('');
+    this.success.set('');
+    this.showForm.set(true);
+    this.sound.play('click');
+  }
+
+  save() {
+    // Validaciones básicas
+    if (!this.form.nombre.trim() || !this.form.email.trim() || !this.form.password.trim()) {
+      this.error.set('Todos los campos son obligatorios.');
+      return;
+    }
+    if (this.form.password.length < 12) {
+      this.error.set('La contraseña debe tener al menos 12 caracteres.');
+      return;
+    }
+
+    this.saving.set(true);
+    this.error.set('');
+
+    const body = {
+      nombre:   this.form.nombre,
+      email:    this.form.email,
+      password: this.form.password,
+      rol:      this.form.rol,   // nuevo contrato: "rol" string, no "roles" array
+    };
+
+    this.api.createUsuario(body).subscribe({
+      next: (u) => {
+        this.users.push(u);
+        this.saving.set(false);
+        this.showForm.set(false);
+        this.success.set(`Cuenta de ${u.nombre} creada correctamente.`);
+        this.sound.play('success');
+        setTimeout(() => this.success.set(''), 4000);
+        this.loadUsers(); // recargar lista real
+      },
+      error: (err) => {
+        this.error.set(err?.message ?? 'Error al crear la cuenta. Verifica que el email no esté en uso.');
+        this.saving.set(false);
+        this.sound.play('error');
+      }
+    });
+  }
+
+  toggleEstado(u: BackendUser) {
+    const nuevo = u.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+    this.api.patchUsuarioStatus(u.id, nuevo).subscribe({
+      next: () => {
+        u.estado = nuevo;
+        this.sound.play('click');
+      },
+      error: () => {}
+    });
+  }
+
+  close() { this.showForm.set(false); }
+
+  rolBadge(roles: string[]) {
+    if (roles.includes('ADMIN'))      return 'badge--danger';
+    if (roles.includes('SUPERVISOR')) return 'badge--warning';
+    return 'badge--info';
+  }
+
+  rolLabel(roles: string[]) {
+    if (roles.includes('ADMIN'))      return 'ADMIN';
+    if (roles.includes('SUPERVISOR')) return 'SUPERVISOR';
+    return 'VENDEDOR';
+  }
+
+  get totalAdmins()     { return this.users.filter(u => u.roles.includes('ADMIN')).length; }
+  get totalVendedores() { return this.users.filter(u => u.roles.includes('VENDEDOR')).length; }
+  get totalActivos()    { return this.users.filter(u => u.estado === 'ACTIVO').length; }
 }

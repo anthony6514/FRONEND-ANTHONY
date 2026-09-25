@@ -27,12 +27,13 @@ export class SidebarComponent {
   sound = inject(SoundService);
 
   navItems: NavItem[] = [
-    { icon: 'dashboard',        label: 'Inicio',     route: '/dashboard'   },
-    { icon: 'inventory_2',      label: 'Stock',      route: '/inventario'  },
-    { icon: 'description',      label: 'Proformas',      route: '/proformas'      },
-    { icon: 'swap_vert',        label: 'Movimientos',    route: '/movimientos'    },
-    { icon: 'people',           label: 'Clientes',       route: '/clientes'       },
-    { icon: 'receipt_long',     label: 'Recibos',        route: '/recibos'        },
+    { icon: 'dashboard',        label: 'Inicio',         route: '/dashboard'                },
+    { icon: 'inventory_2',      label: 'Stock',          route: '/inventario'               },
+    { icon: 'description',      label: 'Proformas',      route: '/proformas'                },
+    { icon: 'swap_vert',        label: 'Movimientos',    route: '/movimientos'              },
+    { icon: 'people',           label: 'Clientes',       route: '/clientes'                 },
+    { icon: 'receipt_long',     label: 'Recibos',        route: '/recibos'                  },
+    { icon: 'manage_accounts',  label: 'Usuarios',       route: '/usuarios',  adminOnly: true },
     { icon: 'settings',         label: 'Configuración',  route: '/configuracion', adminOnly: true },
   ];
 

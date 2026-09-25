@@ -235,3 +235,42 @@
   .hint-pass { font-size: .78rem; color: var(--text-secondary); }
   code { background: var(--border); padding: 1px 5px; border-radius: 3px; font-size: .8rem; }
 }
+
+// ─── ¿Olvidaste contraseña? ──────────────────────────────────────────────────
+.forgot-row {
+  display: flex; justify-content: flex-end; margin: -6px 0 14px;
+}
+.forgot-link {
+  background: none; border: none; cursor: pointer;
+  color: var(--brand-orange); font-size: .82rem; font-weight: 500;
+  padding: 0; transition: opacity var(--transition);
+  &:hover { opacity: .75; text-decoration: underline; }
+}
+
+.forgot-card {
+  background: var(--brand-orange-soft);
+  border: 1px solid rgba(255,90,0,.25);
+  border-radius: var(--radius-md);
+  padding: 20px; margin-bottom: 20px; text-align: center;
+
+  p { font-size: .88rem; color: var(--text-primary); line-height: 1.6; margin-bottom: 8px; }
+  .forgot-hint { font-size: .82rem; color: var(--text-secondary); }
+}
+.forgot-icon {
+  font-size: 2.5rem !important; color: var(--brand-orange);
+  display: block; margin-bottom: 12px;
+}
+.forgot-steps {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 14px; text-align: left;
+}
+.step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: .82rem; color: var(--text-primary);
+}
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--brand-orange); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 700; flex-shrink: 0;
+}

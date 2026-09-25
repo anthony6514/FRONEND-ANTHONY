@@ -1,30 +1,21 @@
 <div class="login-page">
+
+  <!-- ══ Panel izquierdo: brand ══ -->
   <div class="login-brand">
     <div class="brand-content">
-      <div class="brand-logo">
-        <img src="assets/logo-inventio.png" alt="INVENTIO" class="brand-logo-img" />
-      </div>
+      <div class="brand-logo"><img src="/logo-inventio.png" alt="INVENTIO" style="width:72px;object-fit:contain" /></div>
       <h1 class="brand-title">INVENTIO</h1>
-      <p class="brand-subtitle">Sistema de gestión de inventario</p>
+      <p class="brand-subtitle">Distribuidora de Productos REPSOL</p>
       <div class="brand-features">
-        <div class="feature-item">
-          <span class="material-icons-round">inventory_2</span>
-          <span>Control de inventario en tiempo real</span>
-        </div>
-        <div class="feature-item">
-          <span class="material-icons-round">description</span>
-          <span>Gestión de proformas y ventas</span>
-        </div>
-        <div class="feature-item">
-          <span class="material-icons-round">receipt_long</span>
-          <span>Seguimiento de recibos y saldos</span>
-        </div>
-        <div class="feature-item">
-          <span class="material-icons-round">bar_chart</span>
-          <span>Reportes y estadísticas avanzadas</span>
-        </div>
+        <div class="feature-item"><span class="material-icons-round">inventory_2</span><span>Control de inventario en tiempo real</span></div>
+        <div class="feature-item"><span class="material-icons-round">description</span><span>Gestión de proformas y ventas</span></div>
+        <div class="feature-item"><span class="material-icons-round">receipt_long</span><span>Seguimiento de recibos y saldos</span></div>
+        <div class="feature-item"><span class="material-icons-round">bar_chart</span><span>Reportes y estadísticas avanzadas</span></div>
       </div>
-
+      <div class="repsol-partner">
+        <img src="/logo-inventio.png" alt="INVENTIO" class="repsol-img" />
+        <span>Distribuidor autorizado</span>
+      </div>
     </div>
     <div class="drops">
       <div class="drop drop-1"></div>
@@ -33,67 +24,87 @@
     </div>
   </div>
 
+  <!-- ══ Panel derecho: formulario ══ -->
   <div class="login-form-panel">
     <div class="form-card animate-fade">
-      <div class="form-header">
-        <h2>Iniciar sesión</h2>
-        <p>Accede a tu cuenta INVENTIO</p>
-      </div>
 
-      <form (ngSubmit)="submit()" #f="ngForm">
-        <div class="form-group">
-          <label>Correo electrónico</label>
-          <div class="input-wrap">
-            <span class="material-icons-round input-icon">email</span>
-            <input
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="usuario@inventio.pe"
-              required
-              autocomplete="email" />
-          </div>
+      <!-- ─── VISTA: LOGIN ─────────────────────────────── -->
+      <ng-container *ngIf="vista === 'login'">
+        <div class="form-header">
+          <h2>Iniciar sesión</h2>
+          <p>Accede a tu cuenta INVENTIO</p>
         </div>
 
-        <div class="form-group">
-          <label>Contraseña</label>
-          <div class="input-wrap">
-            <span class="material-icons-round input-icon">lock</span>
-            <input
-              [type]="showPass ? 'text' : 'password'"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="••••••••"
-              required
-              autocomplete="current-password" />
-            <button type="button" class="pass-toggle" (click)="showPass = !showPass">
-              <span class="material-icons-round">{{ showPass ? 'visibility_off' : 'visibility' }}</span>
+        <form (ngSubmit)="submit()" #f="ngForm">
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <div class="input-wrap">
+              <span class="material-icons-round input-icon">email</span>
+              <input type="email" [(ngModel)]="email" name="email"
+                     placeholder="correo@empresa.com" required autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Contraseña</label>
+            <div class="input-wrap">
+              <span class="material-icons-round input-icon">lock</span>
+              <input [type]="showPass ? 'text' : 'password'"
+                     [(ngModel)]="password" name="password"
+                     placeholder="••••••••" required autocomplete="current-password" />
+              <button type="button" class="pass-toggle" (click)="showPass = !showPass">
+                <span class="material-icons-round">{{ showPass ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ¿Olvidaste tu contraseña? -->
+          <div class="forgot-row">
+            <button type="button" class="forgot-link" (click)="vista = 'forgot'">
+              ¿Olvidaste tu contraseña?
             </button>
           </div>
+
+          <div class="form-error" *ngIf="error()">
+            <span class="material-icons-round">error_outline</span>
+            {{ error() }}
+          </div>
+
+          <button type="submit" class="btn-login" [disabled]="loading() || !email || !password">
+            <span *ngIf="!loading()"><span class="material-icons-round">login</span> Ingresar</span>
+            <span *ngIf="loading()" class="spinner"></span>
+          </button>
+        </form>
+
+
+      </ng-container>
+
+      <!-- ─── VISTA: OLVIDÉ CONTRASEÑA ─────────────────── -->
+      <ng-container *ngIf="vista === 'forgot'">
+        <div class="form-header">
+          <h2>¿Olvidaste tu contraseña?</h2>
+          <p>Sigue las instrucciones para recuperar tu acceso</p>
         </div>
 
-        <div class="form-error" *ngIf="error()">
-          <span class="material-icons-round">error_outline</span>
-          {{ error() }}
+        <div class="forgot-card">
+          <span class="material-icons-round forgot-icon">admin_panel_settings</span>
+          <p>El restablecimiento de contraseñas lo realiza únicamente el <strong>Administrador</strong> del sistema.</p>
+          <p class="forgot-hint">
+            Comunícate con tu administrador y pídele que restablezca tu acceso desde
+            <strong>Gestión de Usuarios → Resetear contraseña</strong>.
+          </p>
+          <div class="forgot-steps">
+            <div class="step"><span class="step-num">1</span><span>Contacta al administrador</span></div>
+            <div class="step"><span class="step-num">2</span><span>El admin te crea una nueva contraseña</span></div>
+            <div class="step"><span class="step-num">3</span><span>Inicia sesión con la nueva contraseña</span></div>
+          </div>
         </div>
 
-        <button type="submit" class="btn-login" [disabled]="loading() || !email || !password">
-          <span *ngIf="!loading()">
-            <span class="material-icons-round">login</span>
-            Ingresar
-          </span>
-          <span *ngIf="loading()" class="spinner"></span>
+        <button class="btn-login" (click)="vista = 'login'">
+          <span class="material-icons-round">arrow_back</span> Volver al inicio de sesión
         </button>
-      </form>
+      </ng-container>
 
-      <div class="demo-hint">
-        <p class="hint-title">Cuentas de demostración</p>
-        <div class="hint-accounts">
-          <span (click)="email='admin@inventio.pe'; password='123456'">admin@inventio.pe</span>
-          <span (click)="email='jaime@inventio.pe'; password='123456'">jaime@inventio.pe</span>
-        </div>
-        <p class="hint-pass">Contraseña: <code>123456</code></p>
-      </div>
     </div>
   </div>
 </div>

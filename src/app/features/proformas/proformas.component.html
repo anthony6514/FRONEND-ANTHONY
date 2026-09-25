@@ -1,115 +1,584 @@
 <div class="proformas animate-fade">
-  <div class="page-header">
-    <div>
-      <h1>Proformas</h1>
-      <p class="breadcrumb">Inicio / Proformas</p>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
-      <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
-      <button class="btn btn--primary" (click)="openNew()">
-        <span class="material-icons-round">add</span> Nueva proforma
-      </button>
-    </div>
-  </div>
 
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--orange"><span class="material-icons-round">description</span></div>
-      <div class="stat-body"><span class="stat-label">Total proformas</span><span class="stat-value">{{ totalProformas }}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--info"><span class="material-icons-round">calendar_month</span></div>
-      <div class="stat-body"><span class="stat-label">Proformas del mes</span><span class="stat-value">{{ delMes }}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--success"><span class="material-icons-round">check_circle</span></div>
-      <div class="stat-body"><span class="stat-label">Proformas aprobadas</span><span class="stat-value">{{ aprobadas }}</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon stat-icon--warning"><span class="material-icons-round">monetization_on</span></div>
-      <div class="stat-body"><span class="stat-label">Monto proformado del mes</span><span class="stat-value">S/ {{ montoMes | number:'1.0-0' }}</span></div>
-    </div>
-  </div>
+  <!-- ══════════════════════════════════════════════════════════ LISTA ══ -->
+  <ng-container *ngIf="!showNew()">
 
-  <!-- Loading indicator -->
-  <div class="loading-row" *ngIf="loading()">
-    <span class="material-icons-round spin">autorenew</span> Cargando datos del servidor...
-  </div>
-
-  <!-- Table card -->
-  <div class="card table-card" *ngIf="!loading()">
-    <div class="toolbar">
-      <div class="search-bar" style="flex:1;max-width:300px">
-        <span class="material-icons-round">search</span>
-        <input placeholder="N° proforma, cliente, vendedor..."
-               [value]="search()" (input)="search.set($any($event.target).value)" />
+    <div class="page-header">
+      <div>
+        <h1>Proformas</h1>
+        <p class="breadcrumb">Inicio / Proformas</p>
       </div>
-      <select class="filter-select"><option>Estado: Todos</option><option>EMITIDA</option><option>ANULADA</option></select>
-      <select class="filter-select"><option>Vendedor: Todos</option><option>Barón</option><option>Jaime</option></select>
-      <select class="filter-select"><option>Moneda: Todos</option><option>PEN</option><option>USD</option></select>
-    </div>
-
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>N° Proforma</th><th>Fecha</th><th>F. Vence</th>
-            <th>Cliente</th><th>Vendedor</th><th>Moneda</th>
-            <th>Total</th><th>Estado</th><th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let p of filtered()">
-            <td class="mono">{{ p.numero }}</td>
-            <td>{{ p.fecha }}</td>
-            <td>{{ p.fechaVence || '—' }}</td>
-            <td>{{ p.clienteNombre }}</td>
-            <td>{{ p.vendedor }}</td>
-            <td><span class="badge badge--info">{{ p.moneda }}</span></td>
-            <td class="fw-600">S/ {{ p.total | number:'1.2-2' }}</td>
-            <td><span class="badge" [ngClass]="estadoBadge(p.estado)">{{ p.estado }}</span></td>
-            <td>
-              <div class="actions">
-                <button class="icon-btn" title="Ver"><span class="material-icons-round">visibility</span></button>
-                <button class="icon-btn" title="PDF"><span class="material-icons-round">picture_as_pdf</span></button>
-                <button class="icon-btn" title="Editar"><span class="material-icons-round">edit</span></button>
-                <button class="icon-btn icon-btn--danger" title="Anular"><span class="material-icons-round">delete</span></button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="table-footer">
-      <span>Total: {{ filtered().length }}</span>
-      <span class="fw-600">Total: S/ {{ montoMes | number:'1.2-2' }}</span>
-    </div>
-  </div>
-
-  <!-- Modal nueva proforma -->
-  <div class="modal-backdrop" *ngIf="showNew()" (click)="close()">
-    <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Nueva Proforma</h3>
-        <button class="icon-btn" (click)="close()"><span class="material-icons-round">close</span></button>
+      <div class="header-actions">
+        <button class="btn btn--outline"><span class="material-icons-round">download</span> Exportar Excel</button>
+        <button class="btn btn--outline"><span class="material-icons-round">print</span> Imprimir</button>
+        <button class="btn btn--primary" (click)="openNew()">
+          <span class="material-icons-round">add</span> Nueva proforma
+        </button>
       </div>
-      <div class="modal-body">
-        <div class="mock-form-grid">
-          <div class="fg"><label>N° Proforma</label><input [value]="'PRO-' + (totalProformas + 1)" readonly /></div>
-          <div class="fg"><label>Fecha</label><input type="date" /></div>
-          <div class="fg"><label>Vendedor</label><select><option>Barón</option><option>Jaime</option></select></div>
-          <div class="fg"><label>Moneda</label><select><option>PEN – Soles</option><option>USD – Dólares</option></select></div>
-          <div class="fg" style="grid-column:span 2"><label>Cliente</label><input placeholder="Buscar cliente..." /></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--orange"><span class="material-icons-round">description</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Total proformas</span>
+          <span class="stat-value">{{ totalProformas }}</span>
         </div>
-        <div class="modal-hint"><span class="material-icons-round">info</span> Conecta el backend para guardar proformas reales.</div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn--outline" (click)="close()">Cancelar</button>
-        <button class="btn btn--primary"><span class="material-icons-round">save</span> Guardar</button>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--info"><span class="material-icons-round">calendar_month</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Proformas del mes</span>
+          <span class="stat-value">{{ delMes }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--success"><span class="material-icons-round">check_circle</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Proformas aprobadas</span>
+          <span class="stat-value">{{ aprobadas }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stat-icon--warning"><span class="material-icons-round">monetization_on</span></div>
+        <div class="stat-body">
+          <span class="stat-label">Monto proformado del mes</span>
+          <span class="stat-value">S/ {{ montoMes | number:'1.0-0' }}</span>
+        </div>
       </div>
     </div>
+
+    <!-- Loading -->
+    <div class="loading-row" *ngIf="loading()">
+      <span class="material-icons-round spin">autorenew</span> Cargando datos del servidor...
+    </div>
+
+    <!-- Tabla -->
+    <div class="card table-card" *ngIf="!loading()">
+      <div class="toolbar">
+        <div class="search-bar" style="flex:1;max-width:300px">
+          <span class="material-icons-round">search</span>
+          <input placeholder="N° proforma, cliente, vendedor..."
+                 [value]="search()" (input)="search.set($any($event.target).value)" />
+        </div>
+        <select class="filter-select">
+          <option>Estado: Todos</option><option>EMITIDA</option><option>ANULADA</option>
+        </select>
+        <select class="filter-select">
+          <option>Vendedor: Todos</option>
+        </select>
+        <select class="filter-select">
+          <option>Moneda: Todos</option><option>PEN</option><option>USD</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>N° Proforma</th><th>Fecha</th><th>F. Vence</th>
+              <th>Cliente</th><th>Vendedor</th><th>Moneda</th>
+              <th>Total</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of filtered()">
+              <td class="mono">{{ p.numero }}</td>
+              <td>{{ p.fecha }}</td>
+              <td>{{ p.fechaVence || '—' }}</td>
+              <td>{{ p.clienteNombre }}</td>
+              <td>{{ p.vendedor }}</td>
+              <td><span class="badge badge--info">{{ p.moneda }}</span></td>
+              <td class="fw-600">S/ {{ p.total | number:'1.2-2' }}</td>
+              <td><span class="badge" [ngClass]="estadoBadge(p.estado)">{{ p.estado }}</span></td>
+              <td>
+                <div class="actions">
+                  <!-- Ver detalle -->
+                  <button class="icon-btn" title="Ver detalle"
+                          (click)="verDetalle(p)">
+                    <span class="material-icons-round">visibility</span>
+                  </button>
+                  <!-- Descargar PDF -->
+                  <button class="icon-btn" title="Descargar PDF"
+                          (click)="descargarPdf(p)"
+                          [disabled]="descargandoPdf() === p.id">
+                    <span class="material-icons-round">
+                      {{ descargandoPdf() === p.id ? 'hourglass_empty' : 'picture_as_pdf' }}
+                    </span>
+                  </button>
+                  <!-- Anular (solo si está EMITIDA) -->
+                  <button class="icon-btn icon-btn--danger" title="Anular proforma"
+                          (click)="confirmarAnular(p)"
+                          [disabled]="p.estado === 'ANULADA'"
+                          [style.opacity]="p.estado === 'ANULADA' ? '0.35' : '1'">
+                    <span class="material-icons-round">cancel</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filtered().length === 0">
+              <td colspan="9" class="empty-row">No hay proformas registradas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span>Total: {{ filtered().length }}</span>
+        <span class="fw-600">Total: S/ {{ montoMes | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+  </ng-container>
+  <!-- ════════════════════════════════════════════ FIN LISTA ══════════════ -->
+
+
+  <!-- ══════════════════════════════════════ NUEVA PROFORMA (pantalla) ══ -->
+  <ng-container *ngIf="showNew()">
+
+    <!-- Sub-header -->
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn" (click)="close()" title="Volver">
+          <span class="material-icons-round">arrow_back</span>
+        </button>
+        <div>
+          <h1>Nueva Proforma</h1>
+          <p class="breadcrumb">Inicio / Proformas / Nueva</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn--outline" (click)="close()">Cancelar</button>
+        <button class="btn btn--primary" (click)="guardar()" [disabled]="saving()">
+          <span class="material-icons-round">{{ saving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ saving() ? 'Guardando…' : 'Guardar proforma' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="alert-error" *ngIf="errorMsg">
+      <span class="material-icons-round">error_outline</span> {{ errorMsg }}
+    </div>
+
+    <!-- Dos columnas: formulario | preview -->
+    <div class="pf-create-grid">
+
+      <!-- ─── Columna izquierda: Formulario ─────────────────────────────── -->
+      <div class="pf-form-col">
+
+        <!-- Cabecera de la proforma -->
+        <div class="card pf-section">
+          <p class="pf-section-title">Datos generales</p>
+          <div class="pf-header-grid">
+            <div class="fg">
+              <label>N° Proforma</label>
+              <input [value]="nro" readonly class="input-readonly" />
+            </div>
+            <div class="fg">
+              <label>Fecha</label>
+              <input type="date" [(ngModel)]="fecha" />
+            </div>
+            <div class="fg">
+              <label>Moneda</label>
+              <select [(ngModel)]="moneda">
+                <option value="PEN">PEN – Soles</option>
+                <option value="USD">USD – Dólares</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cliente -->
+        <div class="card pf-section">
+          <p class="pf-section-title">Cliente</p>
+          <div class="fg" style="position:relative">
+            <label>Buscar cliente (nombre o RUC)</label>
+            <div class="input-search">
+              <input [(ngModel)]="clienteSearch"
+                     (ngModelChange)="onClienteInput()"
+                     placeholder="Escribe nombre o RUC..." />
+              <span class="material-icons-round">person_search</span>
+            </div>
+            <!-- Dropdown sugerencias -->
+            <div class="cliente-dropdown" *ngIf="clientesFiltrados.length > 0">
+              <div class="cliente-option"
+                   *ngFor="let c of clientesFiltrados"
+                   (click)="seleccionarCliente(c)">
+                <span class="co-nombre">{{ c.nombre }}</span>
+                <span class="co-ruc">{{ c.ruc }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Datos del cliente seleccionado -->
+          <div class="cliente-chip" *ngIf="clienteSeleccionado">
+            <span class="material-icons-round">verified_user</span>
+            <div>
+              <strong>{{ clienteSeleccionado.nombre }}</strong>
+              <span>RUC: {{ clienteSeleccionado.ruc }} · {{ clienteSeleccionado.ciudad || 'Sin ciudad' }}</span>
+            </div>
+            <button class="icon-btn" (click)="clienteSeleccionado=null;clienteId=0;clienteSearch=''">
+              <span class="material-icons-round" style="font-size:1rem">close</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Líneas de detalle -->
+        <div class="card pf-section">
+          <p class="pf-section-title">
+            Productos
+            <button class="btn btn--outline btn--sm" (click)="addLinea()">
+              <span class="material-icons-round">add</span> Agregar línea
+            </button>
+          </p>
+
+          <div class="table-wrap">
+            <table class="data-table pf-detalle-table">
+              <thead>
+                <tr>
+                  <th style="width:35%">Producto</th>
+                  <th style="width:15%">Presentación</th>
+                  <th style="width:10%">Cant.</th>
+                  <th style="width:15%">P. Unitario</th>
+                  <th style="width:15%">Importe</th>
+                  <th style="width:10%"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let l of lineas; let i = index">
+                  <td>
+                    <select class="cell-input"
+                            [value]="l.productoId || ''"
+                            (change)="onProductoChange(i, $any($event.target).value)">
+                      <option value="">-- Seleccionar --</option>
+                      <option *ngFor="let p of productos()" [value]="p.id">
+                        {{ p.nombre }}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <input class="cell-input" [value]="l.presentacion" readonly />
+                  </td>
+                  <td>
+                    <input class="cell-input cell-num" type="number" min="1"
+                           [(ngModel)]="l.cantidad"
+                           (ngModelChange)="calcLinea(i)" />
+                  </td>
+                  <td>
+                    <input class="cell-input cell-num" type="number" min="0" step="0.01"
+                           [(ngModel)]="l.precioUnitario"
+                           (ngModelChange)="calcLinea(i)" />
+                  </td>
+                  <td class="fw-600 right">
+                    {{ moneda === 'USD' ? '$' : 'S/' }} {{ l.importe | number:'1.2-2' }}
+                  </td>
+                  <td>
+                    <button class="icon-btn icon-btn--danger" (click)="removeLinea(i)">
+                      <span class="material-icons-round">delete</span>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="lineas.length === 0">
+                  <td colspan="6" class="empty-row">Agrega al menos una línea.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Totales + observaciones -->
+        <div class="card pf-section">
+          <div class="pf-adicional-grid">
+            <div class="pf-adicional-left">
+              <div class="fg">
+                <label>Observaciones</label>
+                <textarea rows="3" [(ngModel)]="observacion" placeholder="Condiciones, notas adicionales..."></textarea>
+              </div>
+            </div>
+            <div class="pf-totales">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ subtotalCalc | number:'1.2-2' }}</span>
+              </div>
+              <div class="total-row">
+                <span>IGV (18%)</span>
+                <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ igvCalc | number:'1.2-2' }}</span>
+              </div>
+              <div class="total-row total-final">
+                <span>TOTAL</span>
+                <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ totalCalc | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- ─── FIN columna formulario ─────────────────────────────────────── -->
+
+
+      <!-- ─── Columna derecha: Vista previa PDF ─────────────────────────── -->
+      <div class="pf-preview">
+        <p class="preview-label">Vista previa del documento</p>
+
+        <div class="pdf-sheet">
+
+          <!-- Cabecera PDF -->
+          <div class="pdf-header">
+            <div class="pdf-logo-block">
+              <img src="/logo-inventio.png" alt="Inventio" class="pdf-repsol-logo" />
+              <div class="pdf-empresa">
+                <strong>Distribuidora Repsol S.A.C.</strong>
+                <span>RUC: 20601234567</span>
+                <span>Av. Industrial 123, Lima</span>
+                <span>Telf: (01) 234-5678</span>
+              </div>
+            </div>
+            <div class="pdf-doc-block">
+              <div class="pdf-doc-title">PROFORMA</div>
+              <div class="pdf-doc-num">{{ nro || 'PRO-1' }}</div>
+              <div class="pdf-doc-fecha">Fecha: {{ hoy }}</div>
+              <div class="pdf-doc-fecha">Vence: {{ fechaVenceCalc }}</div>
+            </div>
+          </div>
+
+          <!-- Datos cliente -->
+          <div class="pdf-cliente-block">
+            <div>
+              <div class="pdf-block-title">Cliente</div>
+              <table class="pdf-info-table">
+                <tr><td>Razón social:</td><td>{{ clienteSeleccionado?.nombre || '—' }}</td></tr>
+                <tr><td>RUC:</td><td>{{ clienteSeleccionado?.ruc || '—' }}</td></tr>
+                <tr><td>Dirección:</td><td>{{ clienteSeleccionado?.ciudad || '—' }}</td></tr>
+              </table>
+            </div>
+            <div>
+              <div class="pdf-block-title">Condiciones</div>
+              <table class="pdf-info-table">
+                <tr><td>Moneda:</td><td>{{ moneda === 'PEN' ? 'Soles (S/)' : 'Dólares ($)' }}</td></tr>
+                <tr><td>Validez:</td><td>30 días</td></tr>
+                <tr><td>Entrega:</td><td>Inmediata</td></tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tabla de productos -->
+          <table class="pdf-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Descripción</th>
+                <th class="center">Presentación</th>
+                <th class="center">Cant.</th>
+                <th class="right">P. Unit.</th>
+                <th class="right">Importe</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let l of lineas; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ l.productoNombre || '—' }}</td>
+                <td class="center">{{ l.presentacion || '—' }}</td>
+                <td class="center">{{ l.cantidad }}</td>
+                <td class="right">{{ l.precioUnitario | number:'1.2-2' }}</td>
+                <td class="right fw-600">{{ l.importe | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="lineas.length === 0">
+                <td colspan="6" style="text-align:center;color:#aaa;padding:10px">Sin productos</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Totales PDF -->
+          <div class="pdf-totales">
+            <div class="pdf-total-row">
+              <span>Subtotal</span>
+              <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ subtotalCalc | number:'1.2-2' }}</span>
+            </div>
+            <div class="pdf-total-row">
+              <span>IGV 18%</span>
+              <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ igvCalc | number:'1.2-2' }}</span>
+            </div>
+            <div class="pdf-total-row pdf-total-final">
+              <span>TOTAL</span>
+              <span>{{ moneda === 'USD' ? '$' : 'S/' }} {{ totalCalc | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Observaciones en PDF -->
+          <div class="pdf-condiciones" *ngIf="observacion">
+            <div>
+              <strong>Observaciones</strong>
+              <p>{{ observacion }}</p>
+            </div>
+          </div>
+
+          <!-- Pie del PDF -->
+          <div class="pdf-footer">
+            <span class="material-icons-round">info</span>
+            <span>Documento referencial · No tiene validez tributaria</span>
+            <span class="pdf-web">www.repsol.com.pe</span>
+          </div>
+
+        </div><!-- /pdf-sheet -->
+      </div>
+      <!-- ─── FIN columna vista previa ───────────────────────────────────── -->
+
+    </div><!-- /pf-create-grid -->
+
+  </ng-container>
+  <!-- ════════════════════════════════ FIN NUEVA PROFORMA ════════════════ -->
+
+
+  <!-- ══════════════════════════════════════ MODAL DETALLE PROFORMA ══════ -->
+  <div class="modal-backdrop" *ngIf="showDetalle() && proformaSeleccionada()" (click)="cerrarDetalle()">
+    <div class="modal-card modal-card--lg animate-fade" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="material-icons-round" style="color:var(--primary)">description</span>
+          <div>
+            <h3 style="margin:0">{{ proformaSeleccionada()!.numero }}</h3>
+            <p style="margin:0;font-size:.8rem;opacity:.6">Detalle de proforma</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge" [ngClass]="estadoBadge(proformaSeleccionada()!.estado)">
+            {{ proformaSeleccionada()!.estado }}
+          </span>
+          <button class="icon-btn" (click)="cerrarDetalle()">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding:20px 24px">
+        <!-- Info general -->
+        <div class="detalle-grid-2">
+          <div class="detalle-field">
+            <span class="detalle-label">N° Proforma</span>
+            <span class="detalle-value mono">{{ proformaSeleccionada()!.numero }}</span>
+          </div>
+          <div class="detalle-field">
+            <span class="detalle-label">Fecha emisión</span>
+            <span class="detalle-value">{{ proformaSeleccionada()!.fecha }}</span>
+          </div>
+          <div class="detalle-field">
+            <span class="detalle-label">Cliente</span>
+            <span class="detalle-value">{{ proformaSeleccionada()!.clienteNombre }}</span>
+          </div>
+          <div class="detalle-field">
+            <span class="detalle-label">Vendedor</span>
+            <span class="detalle-value">{{ proformaSeleccionada()!.vendedor }}</span>
+          </div>
+          <div class="detalle-field">
+            <span class="detalle-label">Moneda</span>
+            <span class="detalle-value">
+              <span class="badge badge--info">{{ proformaSeleccionada()!.moneda }}</span>
+            </span>
+          </div>
+          <div class="detalle-field">
+            <span class="detalle-label">Estado</span>
+            <span class="detalle-value">
+              <span class="badge" [ngClass]="estadoBadge(proformaSeleccionada()!.estado)">
+                {{ proformaSeleccionada()!.estado }}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Líneas de detalle -->
+        <div style="margin-top:16px">
+          <p class="pf-section-title" style="margin-bottom:8px">Productos</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Producto</th>
+                  <th>Presentación</th>
+                  <th class="right">Cantidad</th>
+                  <th class="right">P. Unit.</th>
+                  <th class="right">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of proformaSeleccionada()!.detalles; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ d.productoNombre || ('Producto #' + d.productoId) }}</td>
+                  <td>{{ d.presentacion || '—' }}</td>
+                  <td class="right">{{ d.cantidad | number:'1.0-2' }}</td>
+                  <td class="right">S/ {{ d.precioUnitario | number:'1.2-2' }}</td>
+                  <td class="right fw-600">S/ {{ d.importe | number:'1.2-2' }}</td>
+                </tr>
+                <tr *ngIf="proformaSeleccionada()!.detalles.length === 0">
+                  <td colspan="6" class="empty-row">Sin líneas de detalle.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="totals-row">
+                  <td colspan="5"><strong>Total</strong></td>
+                  <td class="right fw-600">S/ {{ proformaSeleccionada()!.total | number:'1.2-2' }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="cerrarDetalle()">Cerrar</button>
+        <button class="btn btn--outline"
+                (click)="descargarPdf(proformaSeleccionada()!); cerrarDetalle()"
+                [disabled]="descargandoPdf() !== null">
+          <span class="material-icons-round">picture_as_pdf</span>
+          {{ descargandoPdf() !== null ? 'Descargando…' : 'Descargar PDF' }}
+        </button>
+        <button class="btn btn--danger"
+                *ngIf="proformaSeleccionada()!.estado === 'EMITIDA'"
+                (click)="confirmarAnular(proformaSeleccionada()!); cerrarDetalle()">
+          <span class="material-icons-round">cancel</span> Anular
+        </button>
+      </div>
+
+    </div>
   </div>
+  <!-- ══════════════════════════════════ FIN MODAL DETALLE ════════════════ -->
+
+
+  <!-- ══════════════════════════════════════ MODAL CONFIRMAR ANULAR ══════ -->
+  <div class="modal-backdrop" *ngIf="showConfirmAnular()" (click)="cancelarAnular()">
+    <div class="modal-card modal-card--sm animate-fade" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="material-icons-round" style="color:#ef4444">warning</span>
+          <h3 style="margin:0">Confirmar anulación</h3>
+        </div>
+        <button class="icon-btn" (click)="cancelarAnular()">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding:20px 24px">
+        <p style="margin:0;line-height:1.6">
+          ¿Estás seguro de que deseas <strong>anular</strong> esta proforma?<br>
+          Esta acción <strong>no se puede deshacer</strong>.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn--outline" (click)="cancelarAnular()" [disabled]="anulando()">
+          Cancelar
+        </button>
+        <button class="btn btn--danger" (click)="ejecutarAnular()" [disabled]="anulando()">
+          <span class="material-icons-round">{{ anulando() ? 'hourglass_empty' : 'cancel' }}</span>
+          {{ anulando() ? 'Anulando…' : 'Sí, anular' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- ══════════════════════════════════ FIN MODAL ANULAR ═════════════════ -->
+
 </div>

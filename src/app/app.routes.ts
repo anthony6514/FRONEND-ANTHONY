@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -17,6 +18,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     data: { animation: 'dashboard' },
+  },
+
+  {
+    path: 'perfil',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/perfil/perfil.component').then(m => m.PerfilComponent),
+    data: { animation: 'perfil' },
   },
 
   {
@@ -61,7 +70,7 @@ export const routes: Routes = [
 
   {
     path: 'usuarios',
-    canActivate: [authGuard],
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./features/usuarios/usuarios.component').then(m => m.UsuariosComponent),
     data: { animation: 'usuarios' },

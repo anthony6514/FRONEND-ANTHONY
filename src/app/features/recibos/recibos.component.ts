@@ -18,38 +18,42 @@ export class RecibosComponent implements OnInit {
   api   = inject(ApiService);
   sound = inject(SoundService);
 
-  recibos: Recibo[] = [];
-  loading  = signal(true);
-  search   = signal('');
-  showNew  = signal(false);
-  saving   = signal(false);
+  // Signal para que computed() detecte cambios
+  recibos = signal<Recibo[]>([]);
+  loading = signal(true);
+  search  = signal('');
+  showNew = signal(false);
+  saving  = signal(false);
 
-  // Form
   reciboForm = { ventaId: '', monto: '', observacion: '' };
 
   ngOnInit() {
-    this.ds.getRecibosHttp().subscribe(data => {
-      this.recibos = data;
-      this.loading.set(false);
+    this.ds.getRecibosHttp().subscribe({
+      next: data => { this.recibos.set(data); this.loading.set(false); },
+      error: ()   => { this.loading.set(false); }
     });
   }
 
   filtered = computed(() => {
-    const q = this.search().toLowerCase();
-    return q ? this.recibos.filter(r =>
+    const q    = this.search().toLowerCase();
+    const list = this.recibos();
+    return q ? list.filter(r =>
       r.numero.toLowerCase().includes(q) ||
-      r.clienteNombre.toLowerCase().includes(q) ||
-      r.proformaNro.toLowerCase().includes(q)
-    ) : this.recibos;
+      (r.clienteNombre ?? '').toLowerCase().includes(q) ||
+      (r.proformaNro   ?? '').toLowerCase().includes(q)
+    ) : list;
   });
 
-  get cobrosHoy()   { return this.recibos.reduce((s, r) => s + r.monto, 0); }
-  get saldoTotal()  { return this.recibos.reduce((s, r) => s + r.saldoPendiente, 0); }
-  get totalRecibos(){ return this.recibos.length; }
-  get proformasNoCobradas() { return this.recibos.filter(r => r.saldoPendiente > 0).length; }
+  get cobrosHoy()           { return this.recibos().reduce((s, r) => s + r.monto, 0); }
+  get saldoTotal()          { return this.recibos().reduce((s, r) => s + r.saldoPendiente, 0); }
+  get totalRecibos()        { return this.recibos().length; }
+  get proformasNoCobradas() { return this.recibos().filter(r => r.saldoPendiente > 0).length; }
 
   metodo(m: string) {
-    const icons: Record<string,string> = { TRANSFERENCIA:'swap_horiz', EFECTIVO:'payments', CHEQUE:'article', DEPOSITO:'account_balance' };
+    const icons: Record<string, string> = {
+      TRANSFERENCIA: 'swap_horiz', EFECTIVO: 'payments',
+      CHEQUE:        'article',    DEPOSITO: 'account_balance'
+    };
     return icons[m] ?? 'payment';
   }
 
@@ -58,13 +62,13 @@ export class RecibosComponent implements OnInit {
   saveRecibo() {
     this.saving.set(true);
     this.api.createRecibo({
-      ventaId: Number(this.reciboForm.ventaId),
-      monto: Number(this.reciboForm.monto),
+      ventaId:     Number(this.reciboForm.ventaId),
+      monto:       Number(this.reciboForm.monto),
       observacion: this.reciboForm.observacion || undefined,
     }).subscribe({
       next: () => {
         this.ds.getRecibosHttp().subscribe(data => {
-          this.recibos = data;
+          this.recibos.set(data);
           this.saving.set(false);
           this.showNew.set(false);
           this.sound.play('success');
