@@ -5,10 +5,10 @@
       <p class="breadcrumb">Stock / Inventario</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn--primary" (click)="openNuevoProducto()">
+      <button class="btn btn--primary" *ngIf="isAdmin" (click)="openNuevoProducto()">
         <span class="material-icons-round">add</span> Nuevo producto
       </button>
-      <button class="btn btn--outline" (click)="openRegistrarEntrada()">
+      <button class="btn btn--outline" *ngIf="isAdmin" (click)="openRegistrarEntrada()">
         <span class="material-icons-round">add_circle_outline</span> Registrar entrada
       </button>
       <button class="btn btn--outline" (click)="exportarExcel()">

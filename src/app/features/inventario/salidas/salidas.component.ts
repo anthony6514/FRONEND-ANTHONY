@@ -2,6 +2,8 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { DataService } from '../../../core/services/data.service';
 import { SoundService } from '../../../core/services/sound.service';
@@ -150,12 +152,36 @@ export class SalidasComponent implements OnInit {
 
   ngOnInit() {
     this.ds.getInventarioHttp().subscribe({
-      next: prods => { this.productos.set(prods); this.loading.set(false); },
+      next: prods => {
+        this.productos.set(prods);
+        this.cargarHistorial(prods);
+      },
       error: ()   => { this.loading.set(false); },
     });
   }
 
-  salidas  = computed(() => this.movimientos().filter(m => m.tipoMovimiento === 'SALIDA'));
+  private cargarHistorial(prods: Producto[]) {
+    if (prods.length === 0) {
+      this.loading.set(false);
+      return;
+    }
+
+    forkJoin(prods.map(p =>
+      this.ds.getKardexHttp(p.id).pipe(
+        catchError(() => of([]))
+      )
+    )).subscribe(historiales => {
+      const movimientos = historiales.flat().map(m => ({
+        ...m,
+        productoNombre: m.productoNombre || prods.find(p => p.id === m.productoId)?.nombre || `Producto #${m.productoId}`,
+      }));
+      this.movimientos.set(movimientos.sort((a, b) => b.id - a.id));
+      this.loading.set(false);
+    });
+  }
+
+  salidas  = computed(() => this.movimientos().filter(m =>
+    m.tipoMovimiento === 'SALIDA' || m.tipoMovimiento === 'AJUSTE_SALIDA'));
   ajustes  = computed(() => this.movimientos().filter(m => m.tipoMovimiento.startsWith('AJUSTE')));
 
   openModal() {

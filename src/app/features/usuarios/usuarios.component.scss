@@ -31,6 +31,11 @@
   .material-icons-round { font-size: 1rem; }
   &:hover:not(:disabled) { background: var(--brand-orange-soft); color: var(--brand-orange); }
   &:disabled { opacity: .35; cursor: not-allowed; }
+
+  &--danger:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
 }
 
 // ─── Alert success ────────────────────────────────────────────────────────

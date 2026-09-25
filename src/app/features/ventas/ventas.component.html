@@ -93,7 +93,10 @@
                 <button class="icon-btn" title="Ver"><span class="material-icons-round">visibility</span></button>
                 <button class="icon-btn" title="Recibo"><span class="material-icons-round">receipt</span></button>
                 <button class="icon-btn" title="PDF"><span class="material-icons-round">picture_as_pdf</span></button>
-                <button class="icon-btn icon-btn--danger" title="Anular"><span class="material-icons-round">delete</span></button>
+                <button class="icon-btn icon-btn--danger" title="Anular"
+                        *ngIf="auth.isAdmin()">
+                  <span class="material-icons-round">delete</span>
+                </button>
               </div>
             </td>
           </tr>

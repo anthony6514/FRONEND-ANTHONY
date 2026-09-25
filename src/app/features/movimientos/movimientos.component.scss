@@ -127,3 +127,14 @@
   border-top: 2px solid var(--brand-orange);
   strong { color: var(--brand-orange); font-size: 1.1rem; }
 }
+
+/* v2 */
+
+// ─── Aviso solo lectura para VENDEDOR ─────────────────────────────────────
+.aviso-vendedor {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--info-soft); border: 1px solid var(--info);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  font-size: .85rem; color: var(--info); margin-bottom: 16px;
+  .material-icons-round { font-size: 1.1rem; flex-shrink: 0; }
+}

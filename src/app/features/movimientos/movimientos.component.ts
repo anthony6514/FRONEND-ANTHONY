@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from '../../core/services/data.service';
 import { ApiService } from '../../core/services/api.service';
 import { SoundService } from '../../core/services/sound.service';
+import { AuthService } from '../../core/services/auth.service';
 import { MovimientoInventario, Producto } from '../../core/models';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 type Tab   = 'todos' | 'entradas' | 'salidas' | 'ajustes';
 type Vista = 'lista' | 'entrada' | 'salida' | 'ajuste';
@@ -20,12 +23,14 @@ export class MovimientosComponent implements OnInit {
   ds    = inject(DataService);
   api   = inject(ApiService);
   sound = inject(SoundService);
+  auth  = inject(AuthService);
 
   movimientos    = signal<MovimientoInventario[]>([]);
   productos      = signal<Producto[]>([]);  // con stock real desde /inventory
   loading        = signal(true);
   saving         = signal(false);
   errorMsg       = '';
+  readonly _v    = 2; // fuerza nuevo hash de chunk
   productoActual = signal(0);  // id del producto cuyo kardex se muestra
 
   tab    = signal<Tab>('todos');
@@ -37,18 +42,28 @@ export class MovimientosComponent implements OnInit {
     this.ds.getInventarioHttp().subscribe({
       next: inv => {
         this.productos.set(inv);
-        const primero = inv.find(p => p.stock > 0) ?? inv[0];
-        if (primero) {
-          this.productoActual.set(primero.id);
-          this.ds.getKardexHttp(primero.id).subscribe({
-            next:  movs => { this.movimientos.set(movs); this.loading.set(false); },
-            error: ()   => { this.loading.set(false); },
-          });
-        } else {
+        if (inv.length === 0) {
           this.loading.set(false);
+          return;
         }
+        this.cargarHistorial(inv);
       },
       error: () => { this.loading.set(false); },
+    });
+  }
+
+  private cargarHistorial(inv: Producto[]) {
+    forkJoin(inv.map(p =>
+      this.ds.getKardexHttp(p.id).pipe(
+        catchError(() => of([]))
+      )
+    )).subscribe(historiales => {
+      const movimientos = historiales.flat().map(m => ({
+        ...m,
+        productoNombre: m.productoNombre || inv.find(p => p.id === m.productoId)?.nombre || `Producto #${m.productoId}`,
+      }));
+      this.movimientos.set(movimientos.sort((a, b) => b.id - a.id));
+      this.loading.set(false);
     });
   }
 

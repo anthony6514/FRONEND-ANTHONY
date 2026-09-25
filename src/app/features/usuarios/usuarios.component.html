@@ -109,6 +109,14 @@
                 <button class="icon-btn" title="Resetear contraseña" [disabled]="u.id === auth.currentUser()?.id">
                   <span class="material-icons-round">lock_reset</span>
                 </button>
+                <!-- Eliminar usuario (no aplica al propio admin) -->
+                <button
+                  class="icon-btn icon-btn--danger"
+                  title="Eliminar cuenta"
+                  [disabled]="u.id === auth.currentUser()?.id"
+                  (click)="deleteUser(u)">
+                  <span class="material-icons-round">delete</span>
+                </button>
               </div>
             </td>
           </tr>

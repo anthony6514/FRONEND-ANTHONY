@@ -5,6 +5,7 @@ import { DataService } from '../../core/services/data.service';
 import { ApiService } from '../../core/services/api.service';
 import { SoundService } from '../../core/services/sound.service';
 import { ExportService } from '../../core/services/export.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Producto } from '../../core/models';
 // rebuild-trigger
 
@@ -20,6 +21,9 @@ export class InventarioComponent implements OnInit {
   api   = inject(ApiService);
   sound = inject(SoundService);
   exp   = inject(ExportService);
+  auth  = inject(AuthService);
+
+  get isAdmin() { return this.auth.isAdmin(); }
 
   searchTerm       = signal('');
   filtroStock      = signal<'todos' | 'bajo' | 'critico' | 'normal'>('todos');

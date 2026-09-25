@@ -280,6 +280,9 @@ export class ApiService {
   patchUsuarioStatus(id: number, estado: string): Observable<any> {
     return this.http.patch(`${this.base}/usuarios/${id}/estado`, { estado }).pipe(catchError(this.handle));
   }
+  deleteUsuario(id: number): Observable<any> {
+    return this.http.delete(`${this.base}/usuarios/${id}`).pipe(catchError(this.handle));
+  }
 
   // ─── Error handler ────────────────────────────────────────────────────────
   private handle(err: HttpErrorResponse) {

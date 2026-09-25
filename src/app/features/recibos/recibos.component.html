@@ -95,27 +95,97 @@
     </div>
   </div>
 
-  <!-- Modal nuevo recibo -->
+  <!-- ═══ MODAL NUEVO RECIBO ═══ -->
   <div class="modal-backdrop" *ngIf="showNew()" (click)="close()">
     <div class="modal-card animate-fade" (click)="$event.stopPropagation()">
+
       <div class="modal-header">
-        <h3>Nuevo Recibo</h3>
+        <h3><span class="material-icons-round">receipt</span> Nuevo Recibo</h3>
         <button class="icon-btn" (click)="close()"><span class="material-icons-round">close</span></button>
       </div>
+
       <div class="modal-body">
+
+        <!-- Error -->
+        <div class="form-error" *ngIf="errorModal()">
+          <span class="material-icons-round">error_outline</span> {{ errorModal() }}
+        </div>
+
         <div class="recibo-form-grid">
-          <div class="fg"><label>ID Venta</label><input type="number" [(ngModel)]="reciboForm.ventaId" placeholder="Ej: 1" name="ventaId" /></div>
-          <div class="fg"><label>Monto del abono</label><input type="number" [(ngModel)]="reciboForm.monto" placeholder="0.00" name="monto" /></div>
-          <div class="fg" style="grid-column:span 2"><label>Observaciones</label><input [(ngModel)]="reciboForm.observacion" placeholder="Opcional" name="obs" /></div>
+
+          <!-- 1. Cliente -->
+          <div class="fg" style="grid-column:span 2">
+            <label>Cliente</label>
+            <select [ngModel]="clienteSelecId()"
+                    (ngModelChange)="clienteSelecId.set($event); onClienteChange()"
+                    name="clienteId" class="form-select">
+              <option value="">— Selecciona un cliente —</option>
+              <option *ngFor="let c of clientes()" [value]="c.id">
+                {{ c.nombre }}{{ c.ruc ? ' · ' + c.ruc : '' }}
+              </option>
+            </select>
+          </div>
+
+          <!-- 2. Proforma (solo si hay cliente seleccionado) -->
+          <ng-container *ngIf="clienteSelecId()">
+            <div class="fg" style="grid-column:span 2">
+              <label>Proforma con saldo pendiente</label>
+
+              <div class="sin-ventas-inline" *ngIf="ventasDeCliente.length === 0">
+                <span class="material-icons-round">info</span>
+                Este cliente no tiene proformas con saldo pendiente.
+              </div>
+
+              <select *ngIf="ventasDeCliente.length > 0"
+                      [ngModel]="proformaSelecId()"
+                      (ngModelChange)="proformaSelecId.set($event); onProformaChange()"
+                      name="proformaId" class="form-select">
+                <option value="">— Selecciona una proforma —</option>
+                <option *ngFor="let v of ventasDeCliente" [value]="v.ventaId">
+                  {{ v.proformaNro }} · Saldo: {{ v.moneda }} {{ v.saldo | number:'1.2-2' }}
+                </option>
+              </select>
+            </div>
+          </ng-container>
+
+          <!-- 3. Monto y obs (solo si hay proforma seleccionada) -->
+          <ng-container *ngIf="proformaSelecId()">
+
+            <div class="venta-info" style="grid-column:span 2" *ngIf="ventaActual">
+              <span class="material-icons-round">receipt_long</span>
+              <span>Saldo disponible: <strong>{{ ventaActual.moneda }} {{ ventaActual.saldo | number:'1.2-2' }}</strong></span>
+            </div>
+
+            <div class="fg">
+              <label>Monto del abono</label>
+              <input type="number"
+                     [ngModel]="montoAbono()"
+                     (ngModelChange)="montoAbono.set($event)"
+                     placeholder="0.00" name="monto" min="0.01"
+                     [max]="ventaActual?.saldo ?? null" />
+            </div>
+            <div class="fg">
+              <label>Observaciones</label>
+              <input [ngModel]="observacion()"
+                     (ngModelChange)="observacion.set($event)"
+                     placeholder="Opcional" name="obs" />
+            </div>
+
+          </ng-container>
+
         </div>
       </div>
+
       <div class="modal-footer">
         <button class="btn btn--outline" (click)="close()">Cancelar</button>
-        <button class="btn btn--primary" (click)="saveRecibo()" [disabled]="saving()">
+        <button class="btn btn--primary" (click)="saveRecibo()"
+                [disabled]="saving() || !proformaSelecId() || !montoAbono()">
           <span *ngIf="!saving()"><span class="material-icons-round">save</span> Insertar Recibo</span>
           <span *ngIf="saving()">Guardando...</span>
         </button>
       </div>
+
     </div>
   </div>
+
 </div>

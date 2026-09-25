@@ -9,13 +9,13 @@
         <p class="breadcrumb">Inventario / Movimientos</p>
       </div>
       <div class="header-actions">
-        <button class="btn btn--outline" (click)="abrirAjuste()">
+        <button class="btn btn--outline" *ngIf="auth.isAdmin()" (click)="abrirAjuste()">
           <span class="material-icons-round">tune</span> Ajuste
         </button>
-        <button class="btn btn--outline btn--salida" (click)="abrirSalida()">
+        <button class="btn btn--outline btn--salida" *ngIf="auth.isAdmin()" (click)="abrirSalida()">
           <span class="material-icons-round">remove_circle_outline</span> Nueva salida
         </button>
-        <button class="btn btn--outline btn--entrada" (click)="abrirEntrada()">
+        <button class="btn btn--outline btn--entrada" *ngIf="auth.isAdmin()" (click)="abrirEntrada()">
           <span class="material-icons-round">add_circle_outline</span> Nueva entrada
         </button>
       </div>

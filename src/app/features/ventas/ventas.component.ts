@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from '../../core/services/data.service';
 import { SoundService } from '../../core/services/sound.service';
 import { ExportService } from '../../core/services/export.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Venta } from '../../core/models';
 
 @Component({
@@ -17,6 +18,7 @@ export class VentasComponent implements OnInit {
   ds    = inject(DataService);
   sound = inject(SoundService);
   exp   = inject(ExportService);
+  auth  = inject(AuthService);
 
   ventas  = signal<Venta[]>([]);
   loading = signal(true);

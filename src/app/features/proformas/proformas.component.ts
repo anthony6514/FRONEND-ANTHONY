@@ -74,15 +74,25 @@ export class ProformasComponent implements OnInit {
   ngOnInit() {
     this.ds.getProformasHttp().subscribe({
       next:  data => { this.proformas.set(data); this.loading.set(false); },
-      error: ()   => { this.loading.set(false); },
+      error: ()   => {
+        // Fallback a datos mock si el backend no responde
+        this.proformas.set(this.ds.getProformas());
+        this.loading.set(false);
+      },
     });
     this.ds.getProductosHttp().subscribe({
       next:  data => { this.productos.set(data.filter(p => p.estado === 'ACTIVO')); },
-      error: ()   => {},
+      error: ()   => {
+        // Fallback a productos mock
+        this.productos.set(this.ds.getProductos().filter(p => p.estado === 'ACTIVO'));
+      },
     });
     this.ds.getClientesHttp().subscribe({
       next:  data => { this.clientes.set(data); },
-      error: ()   => {},
+      error: ()   => {
+        // Fallback a clientes mock
+        this.clientes.set(this.ds.getClientes());
+      },
     });
   }
 
@@ -142,11 +152,26 @@ export class ProformasComponent implements OnInit {
 
   // ── Búsqueda de cliente ────────────────────────────────────────────────────
   onClienteInput() {
-    const q = this.clienteSearch.toLowerCase();
-    this.clientesFiltrados = q.length > 1
-      ? this.clientes().filter(c =>
-          c.nombre.toLowerCase().includes(q) || (c.ruc ?? '').includes(q))
-      : [];
+    // Limpiar selección si el usuario edita el campo manualmente
+    this.clienteSeleccionado = null;
+    this.clienteId           = 0;
+
+    const q = this.clienteSearch.toLowerCase().trim();
+    if (q.length === 0) {
+      this.clientesFiltrados = [];
+      return;
+    }
+    this.clientesFiltrados = this.clientes().filter(c =>
+      c.nombre.toLowerCase().includes(q) || (c.ruc ?? '').includes(q)
+    );
+
+    // Si solo hay un resultado exacto, seleccionarlo automáticamente
+    if (this.clientesFiltrados.length === 1) {
+      const match = this.clientesFiltrados[0];
+      if (match.nombre.toLowerCase() === q || (match.ruc ?? '') === q) {
+        this.seleccionarCliente(match);
+      }
+    }
   }
 
   seleccionarCliente(c: Cliente) {
@@ -198,7 +223,16 @@ export class ProformasComponent implements OnInit {
   // ── Guardar ────────────────────────────────────────────────────────────────
   guardar() {
     this.errorMsg = '';
-    if (!this.clienteId)            { this.errorMsg = 'Selecciona un cliente.'; return; }
+
+    // Validar cliente — debe estar seleccionado del dropdown, no solo escrito
+    if (!this.clienteSeleccionado || !this.clienteId) {
+      if (this.clienteSearch.trim()) {
+        this.errorMsg = 'Selecciona el cliente de la lista de sugerencias.';
+      } else {
+        this.errorMsg = 'Selecciona un cliente.';
+      }
+      return;
+    }
     if (this.lineas.length === 0)   { this.errorMsg = 'Agrega al menos un producto.'; return; }
     const lineasValidas = this.lineas.filter(l => l.productoId > 0 && l.cantidad > 0);
     if (lineasValidas.length === 0) { this.errorMsg = 'Completa al menos una línea de detalle.'; return; }
@@ -212,11 +246,14 @@ export class ProformasComponent implements OnInit {
       next: () => {
         this.sound.play('success');
         this.saving.set(false);
-        this.ds.getProformasHttp().subscribe(data => this.proformas.set(data));
+        this.ds.getProformasHttp().subscribe({
+          next: data => this.proformas.set(data),
+          error: ()  => this.proformas.set(this.ds.getProformas()),
+        });
         this.close();
       },
       error: (err) => {
-        this.errorMsg = err?.error?.message ?? 'Error al guardar. Revisa los datos.';
+        this.errorMsg = err?.error?.message ?? err?.message ?? 'Error al guardar. Revisa los datos.';
         this.saving.set(false);
       },
     });

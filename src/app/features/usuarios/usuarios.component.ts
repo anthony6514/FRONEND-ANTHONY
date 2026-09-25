@@ -123,6 +123,27 @@ export class UsuariosComponent implements OnInit {
     });
   }
 
+  deleteUser(u: BackendUser) {
+    // Protección: no puede eliminarse a sí mismo
+    if (u.id === this.auth.currentUser()?.id) return;
+
+    if (!confirm(`¿Eliminar la cuenta de ${u.nombre}? Esta acción no se puede deshacer.`)) return;
+
+    this.api.deleteUsuario(u.id).subscribe({
+      next: () => {
+        this.users = this.users.filter(x => x.id !== u.id);
+        this.success.set(`Cuenta de ${u.nombre} eliminada.`);
+        this.sound.play('success');
+        setTimeout(() => this.success.set(''), 4000);
+      },
+      error: (err) => {
+        this.error.set(err?.message ?? 'No se pudo eliminar el usuario.');
+        this.sound.play('error');
+        setTimeout(() => this.error.set(''), 4000);
+      }
+    });
+  }
+
   close() { this.showForm.set(false); }
 
   rolBadge(roles: string[]) {

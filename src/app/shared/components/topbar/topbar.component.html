@@ -19,12 +19,6 @@
       <span class="material-icons-round">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</span>
     </button>
 
-    <!-- Notificaciones -->
-    <button class="action-btn notif-btn">
-      <span class="material-icons-round">notifications</span>
-      <span class="notif-dot"></span>
-    </button>
-
     <!-- Avatar / menú usuario -->
     <div class="user-chip" (click)="showUserMenu = !showUserMenu" *ngIf="auth.currentUser() as user">
       <div class="chip-avatar">{{ user.nombre.charAt(0) }}</div>

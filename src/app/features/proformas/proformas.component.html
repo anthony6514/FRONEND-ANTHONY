@@ -108,8 +108,9 @@
                       {{ descargandoPdf() === p.id ? 'hourglass_empty' : 'picture_as_pdf' }}
                     </span>
                   </button>
-                  <!-- Anular (solo si está EMITIDA) -->
+                  <!-- Anular (solo si está EMITIDA y es ADMIN) -->
                   <button class="icon-btn icon-btn--danger" title="Anular proforma"
+                          *ngIf="auth.isAdmin()"
                           (click)="confirmarAnular(p)"
                           [disabled]="p.estado === 'ANULADA'"
                           [style.opacity]="p.estado === 'ANULADA' ? '0.35' : '1'">
@@ -536,7 +537,7 @@
           {{ descargandoPdf() !== null ? 'Descargando…' : 'Descargar PDF' }}
         </button>
         <button class="btn btn--danger"
-                *ngIf="proformaSeleccionada()!.estado === 'EMITIDA'"
+                *ngIf="proformaSeleccionada()!.estado === 'EMITIDA' && auth.isAdmin()"
                 (click)="confirmarAnular(proformaSeleccionada()!); cerrarDetalle()">
           <span class="material-icons-round">cancel</span> Anular
         </button>
